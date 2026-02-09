@@ -1,6 +1,7 @@
 include .env
 export
 
+ALEMBIC = $(VENV)/bin/alembic
 VENV = venv
 PYTHON = $(VENV)/bin/python
 PIP = $(VENV)/bin/pip
@@ -15,7 +16,7 @@ run-dev:
 	fi
 
 venv: # 
-	python -m venv $(VENV)
+	python3 -m venv $(VENV)
 	$(PIP) install -r requirements.txt
 
 # Установка зависимостей

@@ -1,7 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
+
+
 class Settings(BaseSettings):
-    APP_NAME: str = "fastapi-service"
+    APP_NAME: str = "uni-RecomendAItion"
     DEBUG: bool = False
     
     db_host: str = os.getenv("DB_HOST", "postgres")

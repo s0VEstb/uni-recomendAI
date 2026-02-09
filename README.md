@@ -37,3 +37,124 @@
 
 ### Через Docker (Рекомендуется)
 Сервис полностью готов к запуску в контейнере. Переменные окружения должны передаваться извне (docker-compose или k8s).
+
+
+
+# 1) Чек-лист “новый проект на FastAPI (шаблон) + Postgres + Alembic”
+
+## A. Клон и окружение
+
+```bash
+git clone <REPO_URL>
+cd <project>
+
+# создать .env (важно: Makefile может include .env)
+printf '%s\n' \
+'DB_HOST=localhost' \
+'DB_PORT=5433' \
+'DB_NAME=uni' \
+'DB_USER=app' \
+'DB_PASS=app' \
+'DEBUG=true' \
+'APP_NAME=uni-reco' \
+> .env
+
+# venv и зависимости (если в Makefile venv)
+make venv
+```
+
+> Почему DB_PORT=5433? Потому что на маке часто уже занят 5432 локальным Postgres.
+
+---
+
+## B. Поднять Postgres в Docker (без docker-compose)
+
+```bash
+docker run --name uni-pg \
+  -e POSTGRES_USER=app \
+  -e POSTGRES_PASSWORD=app \
+  -e POSTGRES_DB=uni \
+  -p 5433:5432 \
+  -d postgres:16
+```
+
+Проверка:
+
+```bash
+docker ps
+```
+
+---
+
+## C. Активировать окружение (чтобы не вызывать системный python)
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+## D. Проверить коннект к БД (убивает 90% проблем)
+
+```bash
+python -c "import asyncio, asyncpg
+async def main():
+  conn = await asyncpg.connect('postgresql://app:app@localhost:5433/uni')
+  row = await conn.fetchrow('select current_user, current_database()')
+  print(dict(row))
+  await conn.close()
+asyncio.run(main())"
+```
+
+---
+
+## E. Alembic миграции (первый раз)
+
+Если в шаблоне **нет** готовых миграций — создаём “init”:
+
+```bash
+alembic revision -m "init"
+alembic upgrade head
+alembic current
+```
+
+---
+
+## F. Запуск сервиса
+
+```bash
+make run-dev
+```
+
+Открыть:
+
+* `http://127.0.0.1:8000/docs`
+
+---
+
+## G. Типовые фиксы, которые мы делали
+
+### 1) `.env: missing separator`
+
+Причина: make читает `.env` как makefile, там должны быть только строки вида `KEY=VALUE`, без мусора.
+Фикс: пересоздать `.env` через `printf` (как выше).
+
+### 2) `make migrate: alembic: No such file or directory`
+
+Причина: Makefile зовёт системный `alembic`, а он в venv.
+Фикс: либо запускать `alembic ...` в активированном venv, либо починить Makefile:
+
+Добавить:
+
+```make
+ALEMBIC = $(VENV)/bin/alembic
+```
+
+И заменить `alembic ...` на `$(ALEMBIC) ...`.
+
+### 3) `role "app" does not exist`
+
+Причина: подключались не к тому Postgres (у тебя локальный висел на 5432).
+Фикс: сменить порт контейнера на 5433 и в `.env` тоже.
+
+---

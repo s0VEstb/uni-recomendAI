@@ -2,9 +2,11 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import logging.config
-
 from config import settings
 from app.utils.logging import LOGGING_CONFIG
+
+from app.routes.health import router as health_router
+
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
@@ -26,3 +28,4 @@ def create_app() -> FastAPI:
     return app
 
 app = create_app()
+app.include_router(health_router)
