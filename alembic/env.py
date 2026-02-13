@@ -9,7 +9,7 @@ from alembic import context
 
 
 from config import settings
-from app.db.base import Base  
+from app.db.base import Base
 
 import app.db.models
 
@@ -28,7 +28,7 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://app:app@localhost:5432/uni"
+    "postgresql+asyncpg://app:app@localhost:5433/uni"
 )
 
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
@@ -65,7 +65,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 async def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    
+
     # Создаем асинхронный движок
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
