@@ -11,6 +11,8 @@ from alembic import context
 from config import settings
 from app.db.base import Base  
 
+import app.db.models
+
 
 config = context.config
 
@@ -40,10 +42,17 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        compare_server_default=True,
+        version_table="alembic_version",
+    )
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 
 async def run_migrations_online() -> None:
