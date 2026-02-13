@@ -1,20 +1,24 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "uni-RecomendAItion"
-    DEBUG: bool = False
-    
-    db_host: str = os.getenv("DB_HOST", "postgres")
-    db_port: int = int(os.getenv("DB_PORT", "5432"))
-    db_name: str = os.getenv("DB_NAME", os.getenv("POSTGRES_DB", "mydb"))
-    db_user: str = os.getenv("DB_USER", os.getenv("POSTGRES_USER", "user"))
-    db_pass: str = os.getenv("DB_PASS", os.getenv("POSTGRES_PASSWORD", "password123"))
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    APP_NAME: str = "uni-reco"
+    DEBUG: bool = True
+
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5433
+    DB_NAME: str = "uni"
+    DB_USER: str = "app"
+    DB_PASS: str = "app"
+
     db_driver: str = "postgresql+asyncpg"
 
     @property
     def DATABASE_URL(self) -> str:
-        return f"postgresql+asyncpg://{self.db_user}:{self.db_pass}@{self.db_host}:{self.db_port}/{self.db_name}"
+        return f"{self.db_driver}://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 settings = Settings()
+
+print("DATABASE_URL =", settings.DATABASE_URL)
