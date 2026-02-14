@@ -1,4 +1,4 @@
-# src/main.py
+from app.admin import setup_admin
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import logging.config
@@ -24,7 +24,8 @@ def create_app() -> FastAPI:
         debug=settings.DEBUG,
         lifespan=lifespan,
     )
-    
+
+    setup_admin(app)
     return app
 
 app = create_app()

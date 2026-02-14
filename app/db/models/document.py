@@ -44,6 +44,9 @@ class Document(TimestampMixin, Base):
         passive_deletes=True,
     )
 
+    def __repr__(self):
+        return f"{self.title} ({self.year})"
+
 
 class DocumentChunk(TimestampMixin, Base):
     __tablename__ = "document_chunks"
@@ -67,3 +70,6 @@ class DocumentChunk(TimestampMixin, Base):
     __table_args__ = (
         Index("ix_doc_chunks_doc_pages", "document_id", "page_start", "page_end"),
     )
+
+    def __repr__(self):
+        return f"Chunk of {self.document.title} (pages {self.page_start}-{self.page_end})"

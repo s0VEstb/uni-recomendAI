@@ -28,7 +28,7 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://app:app@localhost:5432/uni"
+    "postgresql+asyncpg://app:app@localhost:5433/uni"
 )
 
 config.set_main_option("sqlalchemy.url", DATABASE_URL)

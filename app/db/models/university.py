@@ -27,6 +27,10 @@ class University(TimestampMixin, Base):
         passive_deletes=True,
     )
 
+    def __repr__(self) -> str:
+        return f"University(id={self.id}, name={self.name})"
+
+
 
 class Program(TimestampMixin, Base):
     __tablename__ = "programs"
@@ -66,3 +70,6 @@ class Program(TimestampMixin, Base):
     __table_args__ = (
         Index("ix_programs_university_lang_form_active", "university_id", "language", "study_form", "is_active"),
     )
+
+    def __repr__(self) -> str:
+        return f"Program(id={self.id}, name={self.name})"

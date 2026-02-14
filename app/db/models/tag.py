@@ -18,6 +18,9 @@ class Tag(TimestampMixin, Base):
     program_links: Mapped[List["ProgramTag"]] = relationship(back_populates="tag")
     submission_links: Mapped[List["SubmissionTag"]] = relationship(back_populates="tag")
 
+    def __repr__(self):
+        return self.title
+
 
 class ProgramTag(Base):
     __tablename__ = "program_tags"
@@ -40,3 +43,7 @@ class ProgramTag(Base):
     __table_args__ = (
         Index("ix_program_tags_tag", "tag_id"),
     )
+
+    def __repr__(self):
+        return f"ProgramTag(program_id={self.program_id}, tag_id={self.tag_id}, weight={self.weight})"
+

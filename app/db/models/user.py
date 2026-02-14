@@ -31,6 +31,9 @@ class User(TimestampMixin, Base):
         passive_deletes=True,
     )
 
+    def __repr__(self):
+        return self.email
+
 
 class SurveySubmission(TimestampMixin, Base):
     __tablename__ = "survey_submissions"
@@ -60,6 +63,9 @@ class SurveySubmission(TimestampMixin, Base):
         passive_deletes=True,
     )
 
+    def __repr__(self):
+        return f"Submission {self.id} by {self.user.email}"
+
 
 class SubmissionTag(Base):
     __tablename__ = "submission_tags"
@@ -79,6 +85,9 @@ class SubmissionTag(Base):
     tag: Mapped["Tag"] = relationship(back_populates="submission_links")
 
     __table_args__ = (Index("ix_submission_tags_tag", "tag_id"),)
+
+    def __repr__(self):
+        return f"Tag {self.tag.name} for Submission {self.submission_id}"
 
 
 class SavedProgram(TimestampMixin, Base):
@@ -103,3 +112,6 @@ class SavedProgram(TimestampMixin, Base):
     __table_args__ = (
         UniqueConstraint("user_id", "program_id", name="uq_saved_user_program"),
     )
+
+    def __repr__(self):
+        return f"{self.user.email} saved {self.program.name}"

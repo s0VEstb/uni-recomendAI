@@ -42,6 +42,10 @@ class ProgramFee(TimestampMixin, Base):
         Index("ix_program_fee_year_currency", "year", "currency"),
     )
 
+    def __repr__(self):
+        return f"ProgramFee(id={self.id}, program_id={self.program_id}, year={self.year})"
+
+
 
 class ProgramAdmission(TimestampMixin, Base):
     __tablename__ = "program_admissions"
@@ -79,3 +83,6 @@ class ProgramAdmission(TimestampMixin, Base):
         Index("ix_program_adm_program_year", "program_id", "year"),
         Index("ix_program_adm_year_ort", "year", "ort_min_score"),
     )
+
+    def __repr__(self):
+        return f"Admission for {self.program} in {self.year}"
