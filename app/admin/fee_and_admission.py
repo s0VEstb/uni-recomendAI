@@ -10,11 +10,11 @@ import logging
 
 class ProgramFeeAdmin(ModelView, model=ProgramFee):
     identity = "program-fee"
-    column_list = [ProgramFee.id, ProgramFee.program_id, ProgramFee.year, ProgramFee.contract_fee, ProgramFee.currency]
+    column_list = [ProgramFee.id, ProgramFee.name, ProgramFee.year, ProgramFee.contract_fee, ProgramFee.currency]
 
-    # ЯВНО говорим какие поля показывать на create/edit
     form_columns = [
         "program",
+        "name",
         "year",
         "contract_fee",
         "currency",

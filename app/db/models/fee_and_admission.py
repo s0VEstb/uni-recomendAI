@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, ForeignKey, Enum, Index, UniqueConstraint
+from sqlalchemy import Integer, ForeignKey, Enum, Index, UniqueConstraint, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.enums import Currency
 from app.db.base import Base, TimestampMixin
@@ -15,6 +15,8 @@ class ProgramFee(TimestampMixin, Base):
         nullable=False,
         index=True,
     )
+
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
 
     year: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
 
@@ -37,13 +39,12 @@ class ProgramFee(TimestampMixin, Base):
 
     __table_args__ = (
         # на одну программу один fee на год (без дублей)
-        UniqueConstraint("program_id", "year", name="uq_program_fee_program_year"),
         Index("ix_program_fee_program_year", "program_id", "year"),
         Index("ix_program_fee_year_currency", "year", "currency"),
     )
 
     def __repr__(self):
-        return f"ProgramFee(id={self.id}, program_id={self.program_id}, year={self.year})"
+        return f"{self.name} year: {self.year}"
 
 
 
