@@ -37,8 +37,3 @@ class TagType(str, enum.Enum):
     strength = "strength"     # сильные стороны
     subject = "subject"       # предметы (математика, биология...)
     career = "career"         # карьера (backend, doctor...)
-
-
-class UserRole(str, enum.Enum):
-    applicant = "applicant"
-    admin = "admin"
