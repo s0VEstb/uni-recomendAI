@@ -6,9 +6,11 @@ from app.db.models import (
 
 
 class DocumentAdmin(ModelView, model=Document):
-    column_list = [Document.id, Document.university_id, Document.title, Document.doc_type, Document.year, Document.received_at]
-    column_searchable_list = [Document.title]
-    #column_filters = [Document.doc_type, Document.year]
+    column_list = [
+        Document.id, Document.university_id, Document.title, Document.doc_type,
+        Document.year, Document.source_url, Document.received_from, Document.received_at
+    ]
+    column_searchable_list = [Document.title, Document.source_url]
 
 
 class DocumentChunkAdmin(ModelView, model=DocumentChunk):

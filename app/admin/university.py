@@ -4,6 +4,7 @@ from app.db.models import (
     University, Program
 )
 from markupsafe import Markup
+from sqladmin.filters import ForeignKeyFilter
 
 
 class UniversityAdmin(ModelView, model=University):
@@ -13,7 +14,7 @@ class UniversityAdmin(ModelView, model=University):
 
 
 class ProgramAdmin(ModelView, model=Program):
-    column_list = [Program.id, Program.name, Program.university_id]
+    column_list = [Program.id, Program.university ,Program.name, Program.university_id]
     column_searchable_list = [Program.name]
 
     column_formatters = {
@@ -22,3 +23,7 @@ class ProgramAdmin(ModelView, model=Program):
             f'<a class="btn btn-sm btn-primary" href="/admin/program-fee/create?program_id={m.id}">+ Fee</a>'
         )
     }
+    
+    column_filters = [
+        ForeignKeyFilter(Program.university_id, "name", University, "Program"),
+    ]

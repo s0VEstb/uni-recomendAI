@@ -28,7 +28,7 @@ class University(TimestampMixin, Base):
     )
 
     def __repr__(self) -> str:
-        return f"University(id={self.id}, name={self.name})"
+        return f"{self.name}"
 
 
 
@@ -72,4 +72,4 @@ class Program(TimestampMixin, Base):
     )
 
     def __repr__(self) -> str:
-        return f"Program(id={self.id}, name={self.name})"
+        return f"id={self.id} - {self.name}"

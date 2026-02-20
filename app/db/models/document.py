@@ -25,7 +25,8 @@ class Document(TimestampMixin, Base):
 
     # Where it is stored on server / storage key (required for re-processing)
     local_path: Mapped[str] = mapped_column(String(1024), nullable=False)
-
+    source_url: Mapped[str] = mapped_column(String(1024), nullable=True)
+    received_from: Mapped[str] = mapped_column(String(255), nullable=True)
     # Versioning / dedup
     checksum: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
 
