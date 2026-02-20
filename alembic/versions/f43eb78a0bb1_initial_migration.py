@@ -1,8 +1,8 @@
-"""init schema
+"""Initial migration
 
-Revision ID: da5df1b4841d
+Revision ID: f43eb78a0bb1
 Revises: 
-Create Date: 2026-02-16 10:21:49.384970
+Create Date: 2026-02-20 18:41:42.590884
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'da5df1b4841d'
+revision: str = 'f43eb78a0bb1'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -52,7 +52,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=320), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
-    sa.Column('role', sa.Enum('applicant', 'admin', name='userrole'), nullable=False),
+    sa.Column('role', sa.Enum('applicant', 'admin', 'superadmin', name='userrole'), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -67,6 +67,8 @@ def upgrade() -> None:
     sa.Column('doc_type', sa.Enum('admission_rules', 'fee_table', 'deadlines', 'other', name='documenttype'), nullable=False),
     sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('local_path', sa.String(length=1024), nullable=False),
+    sa.Column('source_url', sa.String(length=1024), nullable=True),
+    sa.Column('received_from', sa.String(length=255), nullable=True),
     sa.Column('checksum', sa.String(length=128), nullable=True),
     sa.Column('received_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -152,6 +154,7 @@ def upgrade() -> None:
     op.create_table('program_fees',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('program_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('contract_fee', sa.Integer(), nullable=False),
     sa.Column('currency', sa.Enum('KGS', 'USD', 'EUR', name='currency'), nullable=False),
@@ -162,11 +165,11 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['program_id'], ['programs.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['source_document_id'], ['documents.id'], ondelete='RESTRICT'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('program_id', 'year', name='uq_program_fee_program_year')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_program_fee_program_year', 'program_fees', ['program_id', 'year'], unique=False)
     op.create_index('ix_program_fee_year_currency', 'program_fees', ['year', 'currency'], unique=False)
+    op.create_index(op.f('ix_program_fees_name'), 'program_fees', ['name'], unique=False)
     op.create_index(op.f('ix_program_fees_program_id'), 'program_fees', ['program_id'], unique=False)
     op.create_index(op.f('ix_program_fees_source_document_id'), 'program_fees', ['source_document_id'], unique=False)
     op.create_index(op.f('ix_program_fees_year'), 'program_fees', ['year'], unique=False)
@@ -217,6 +220,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_program_fees_year'), table_name='program_fees')
     op.drop_index(op.f('ix_program_fees_source_document_id'), table_name='program_fees')
     op.drop_index(op.f('ix_program_fees_program_id'), table_name='program_fees')
+    op.drop_index(op.f('ix_program_fees_name'), table_name='program_fees')
     op.drop_index('ix_program_fee_year_currency', table_name='program_fees')
     op.drop_index('ix_program_fee_program_year', table_name='program_fees')
     op.drop_table('program_fees')
