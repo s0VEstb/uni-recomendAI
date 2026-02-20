@@ -5,7 +5,7 @@ from typing import Iterable
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from config import settings
+from app.core.config import settings
 from app.db.models.tag import Tag
 from app.db.enums import TagType
 
