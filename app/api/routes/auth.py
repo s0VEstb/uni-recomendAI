@@ -7,13 +7,20 @@ from app.db.repositories.user_repo import UserRepo
 from app.services.auth_service import AuthService
 from app.schemas.auth import RegisterIn, LoginIn, TokenOut
 from app.core.security import decode_token
+from fastapi.security import HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials
+
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+bearer_scheme = HTTPBearer()
 
 async def get_current_user_id(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> int:
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+    token = credentials.credentials
     try:
         payload = decode_token(token)
         return int(payload["sub"])

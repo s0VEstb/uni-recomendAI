@@ -63,8 +63,11 @@ class SurveySubmission(TimestampMixin, Base):
         passive_deletes=True,
     )
 
+
+
     def __repr__(self):
-        return f"Submission {self.id} by {self.user.email}"
+        return f"Submission(id={self.id}, user_id={self.user_id})"
+
 
 
 class SubmissionTag(Base):
@@ -87,7 +90,7 @@ class SubmissionTag(Base):
     __table_args__ = (Index("ix_submission_tags_tag", "tag_id"),)
 
     def __repr__(self):
-        return f"Tag {self.tag.name} for Submission {self.submission_id}"
+        return f"SubmissionTag(submission_id={self.submission_id}, tag_id={self.tag_id})"
 
 
 class SavedProgram(TimestampMixin, Base):
@@ -114,4 +117,4 @@ class SavedProgram(TimestampMixin, Base):
     )
 
     def __repr__(self):
-        return f"{self.user.email} saved {self.program.name}"
+        return f"SavedProgram(user_id={self.user_id}, program_id={self.program_id})"

@@ -12,8 +12,20 @@ class UserAdmin(ModelView, model=User):
 
 
 class SurveySubmissionAdmin(ModelView, model=SurveySubmission):
-    column_list = [SurveySubmission.id, SurveySubmission.user_id, SurveySubmission.ort_score, SurveySubmission.city, SurveySubmission.language]
-    #column_filters = [SurveySubmission.language]
+    column_list = [
+        SurveySubmission.id,
+        SurveySubmission.user_id,
+        SurveySubmission.ort_score,
+        SurveySubmission.city,
+        SurveySubmission.language,
+        "tag_titles"
+    ]
+
+    column_formatters = {
+        "tag_titles": lambda value, column: ", ".join(value) if isinstance(value, list) else ""
+    }
+
+
 
 
 class SavedProgramAdmin(ModelView, model=SavedProgram):
