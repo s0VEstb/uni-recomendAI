@@ -12,7 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 bearer_scheme = HTTPBearer()
 
 async def get_current_user_id(

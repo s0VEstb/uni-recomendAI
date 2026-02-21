@@ -25,17 +25,16 @@ async def submit_survey(
     return SurveySubmitOut(
         message=message,
         submission=submission,
-        universities_top=universities_top,
-        recommendations=recommendations,
+        universities_top=universities_top
     )
 
-@router.get("/latest", response_model=SurveySubmissionOut)
+@router.get("/latest", response_model=SurveySubmitOut)
 async def latest_survey(
     user_id: int = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_async_session),
 ):
     service = SurveyService(db, SurveyRepo(db))
-    sub = await service.latest(user_id=user_id)
-    if not sub:
+    result = await service.latest_with_recommendations(user_id=user_id)
+    if not result:
         raise HTTPException(status_code=404, detail="No submissions yet")
-    return sub
+    return result

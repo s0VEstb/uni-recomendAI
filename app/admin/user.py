@@ -18,11 +18,11 @@ class SurveySubmissionAdmin(ModelView, model=SurveySubmission):
         SurveySubmission.ort_score,
         SurveySubmission.city,
         SurveySubmission.language,
-        "tag_titles"
+        "tag_links"
     ]
 
     column_formatters = {
-        "tag_titles": lambda value, column: ", ".join(value) if isinstance(value, list) else ""
+        "tag_links": lambda value, column: ", ".join(value) if isinstance(value, list) else ""
     }
 
 

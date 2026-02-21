@@ -1,3 +1,5 @@
+from starlette.middleware.cors import CORSMiddleware
+
 from app.admin import setup_admin
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

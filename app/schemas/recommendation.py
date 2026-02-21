@@ -7,7 +7,7 @@ from app.schemas.survey import SurveySubmissionOut
 class RecommendationReason(BaseModel):
     code: str
     message: str
-    meta: dict[str, Any] = {}
+    meta: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProgramOut(BaseModel):
