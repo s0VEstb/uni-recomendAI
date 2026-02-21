@@ -37,3 +37,26 @@ class TagType(str, enum.Enum):
     strength = "strength"     # сильные стороны
     subject = "subject"       # предметы (математика, биология...)
     career = "career"         # карьера (backend, doctor...)
+
+
+class City(str, enum.Enum):
+    """Города Кыргызстана."""
+    bishkek = "bishkek"
+    osh = "osh"
+    jalal_abad = "jalal_abad"
+    karakol = "karakol"
+    tokmok = "tokmok"
+    naryn = "naryn"
+    batken = "batken"
+    talas = "talas"
+    uzgen = "uzgen"
+    kara_balta = "kara_balta"
+    balykchy = "balykchy"
+    bazar_korgon = "bazar_korgon"
+    kyzyl_kiya = "kyzyl_kiya"
+    tash_kumyr = "tash_kumyr"
+    kant = "kant"
+    isfana = "isfana"
+    mailuu_suu = "mailuu_suu"
+    kara_suu = "kara_suu"
+    other = "other"  # другой город

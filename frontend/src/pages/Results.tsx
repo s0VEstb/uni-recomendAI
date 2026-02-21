@@ -1,22 +1,37 @@
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
-import type { SurveySubmitResult } from '../api/client'
-import { RESULTS_KEY } from './Survey'
+import { getLatestSurvey, type SurveySubmitResult } from '../api/client'
 import styles from './Results.module.css'
 
 export default function Results() {
   const location = useLocation()
   const navigate = useNavigate()
   const state = location.state as SurveySubmitResult | null
-  const stored = (() => {
-    try {
-      const raw = localStorage.getItem(RESULTS_KEY)
-      return raw ? (JSON.parse(raw) as SurveySubmitResult) : null
-    } catch {
-      return null
-    }
-  })()
+  const [data, setData] = useState<SurveySubmitResult | null>(state)
+  const [loading, setLoading] = useState(!state)
 
-  const data = state ?? stored
+  useEffect(() => {
+    if (state) {
+      setData(state)
+      setLoading(false)
+      return
+    }
+    async function load() {
+      try {
+        const result = await getLatestSurvey()
+        setData(result)
+      } catch {
+        setData(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [state])
+
+  if (loading) {
+    return <div className={styles.wrap}><p className={styles.loading}>Загрузка…</p></div>
+  }
 
   if (!data) {
     return (

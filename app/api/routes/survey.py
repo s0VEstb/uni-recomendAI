@@ -22,9 +22,23 @@ async def submit_survey(
     universities_top = service.rec_service.build_universities_top(recommendations, limit=5)
     message = service.rec_service.build_message(universities_top, top_n=3)
 
+    submission_out = SurveySubmissionOut(
+        id=submission.id,
+        user_id=submission.user_id,
+        ort_score=submission.ort_score,
+        budget_max=submission.budget_max,
+        city=submission.city,
+        language=submission.language,
+        notes=submission.notes,
+        needs_dorm=submission.needs_dorm,
+        willing_to_relocate=submission.willing_to_relocate,
+        answers=submission.answers or {},
+        tag_ids=payload.tag_ids,
+    )
+
     return SurveySubmitOut(
         message=message,
-        submission=submission,
+        submission=submission_out,
         universities_top=universities_top
     )
 

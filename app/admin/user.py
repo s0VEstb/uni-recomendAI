@@ -18,6 +18,9 @@ class SurveySubmissionAdmin(ModelView, model=SurveySubmission):
         SurveySubmission.ort_score,
         SurveySubmission.city,
         SurveySubmission.language,
+        SurveySubmission.notes,
+        SurveySubmission.needs_dorm,
+        SurveySubmission.willing_to_relocate,
         "tag_links"
     ]
 

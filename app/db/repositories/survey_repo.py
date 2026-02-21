@@ -14,6 +14,9 @@ class SurveyRepo:
         city: str | None,
         language,
         answers: dict,
+        notes: str | None = None,
+        needs_dorm: bool | None = None,
+        willing_to_relocate: bool | None = None,
     ) -> SurveySubmission:
         s = SurveySubmission(
             user_id=user_id,
@@ -22,6 +25,9 @@ class SurveyRepo:
             city=city,
             language=language,
             answers=answers or {},
+            notes=notes,
+            needs_dorm=needs_dorm,
+            willing_to_relocate=willing_to_relocate,
         )
         self.db.add(s)
         await self.db.commit()
@@ -45,3 +51,36 @@ class SurveyRepo:
         )
         res = await self.db.execute(q)
         return res.scalar_one_or_none()
+
+    async def update_submission(
+        self,
+        submission_id: int,
+        user_id: int,
+        ort_score: int,
+        budget_max: int | None,
+        city: str | None,
+        language,
+        answers: dict,
+        notes: str | None = None,
+        needs_dorm: bool | None = None,
+        willing_to_relocate: bool | None = None,
+    ) -> SurveySubmission | None:
+        q = (
+            select(SurveySubmission)
+            .where(SurveySubmission.id == submission_id, SurveySubmission.user_id == user_id)
+        )
+        res = await self.db.execute(q)
+        sub = res.scalar_one_or_none()
+        if not sub:
+            return None
+        sub.ort_score = ort_score
+        sub.budget_max = budget_max
+        sub.city = city
+        sub.language = language
+        sub.answers = answers or {}
+        sub.notes = notes
+        sub.needs_dorm = needs_dorm
+        sub.willing_to_relocate = willing_to_relocate
+        await self.db.commit()
+        await self.db.refresh(sub)
+        return sub

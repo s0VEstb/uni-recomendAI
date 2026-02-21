@@ -17,6 +17,8 @@ class RecommendationService:
             ort_score=submission.ort_score,
             budget_max=submission.budget_max,
             tag_ids=tag_ids,
+            city=submission.city,
+            language=submission.language,
             limit=limit * 15,  # запас на дубли из JOIN (fees, tags)
         )
 
@@ -93,9 +95,9 @@ class RecommendationService:
         result: list[UniversityTopOut] = []
         for b in buckets.values():
             programs_sorted = sorted(b["programs"], key=lambda x: x.score, reverse=True)
-            # Университет: среднее совпадение программ (0–1)
+            # Университет: макс. % среди программ (топ по лучшей программе)
             scores = [float(p.score) for p in programs_sorted]
-            uni_score = round(sum(scores) / len(scores), 4) if scores else 0.0
+            uni_score = round(max(scores), 4) if scores else 0.0
 
             result.append(
                 UniversityTopOut(

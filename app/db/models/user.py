@@ -49,10 +49,15 @@ class SurveySubmission(TimestampMixin, Base):
     # Core inputs
     ort_score: Mapped[int] = mapped_column(Integer, nullable=False)
     budget_max: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    city: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    city: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # City enum value as string
     language: Mapped[Optional[Language]] = mapped_column(Enum(Language), nullable=True)
 
-    # Everything else (relocate, strengths, notes, etc.)
+    # Дополнительные поля
+    notes: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    needs_dorm: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    willing_to_relocate: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+
+    # Everything else (legacy, strengths, etc.)
     answers: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
 
     user: Mapped["User"] = relationship(back_populates="submissions")
@@ -63,7 +68,9 @@ class SurveySubmission(TimestampMixin, Base):
         passive_deletes=True,
     )
 
-
+    @property
+    def tag_ids(self) -> list[int]:
+        return [tl.tag_id for tl in self.tag_links]
 
     def __repr__(self):
         return f"Submission(id={self.id}, user_id={self.user_id})"

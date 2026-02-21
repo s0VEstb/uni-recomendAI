@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { listTags, submitSurvey, type Tag, type SurveyPayload, type Language } from '../api/client'
+import { listTags, submitSurvey, getLatestSurvey, type Tag, type SurveyPayload, type Language, type City } from '../api/client'
 import styles from './Survey.module.css'
 
 const LANGUAGES: { value: Language; label: string }[] = [
@@ -10,7 +10,27 @@ const LANGUAGES: { value: Language; label: string }[] = [
   { value: 'turkish', label: 'Türkçe' },
 ]
 
-const RESULTS_KEY = 'uni_survey_results'
+const CITIES: { value: City; label: string }[] = [
+  { value: 'bishkek', label: 'Бишкек' },
+  { value: 'osh', label: 'Ош' },
+  { value: 'jalal_abad', label: 'Джалал-Абад' },
+  { value: 'karakol', label: 'Каракол' },
+  { value: 'tokmok', label: 'Токмок' },
+  { value: 'naryn', label: 'Нарын' },
+  { value: 'batken', label: 'Баткен' },
+  { value: 'talas', label: 'Талас' },
+  { value: 'uzgen', label: 'Узген' },
+  { value: 'kara_balta', label: 'Кара-Балта' },
+  { value: 'balykchy', label: 'Балыкчы' },
+  { value: 'bazar_korgon', label: 'Базар-Коргон' },
+  { value: 'kyzyl_kiya', label: 'Кызыл-Кия' },
+  { value: 'tash_kumyr', label: 'Таш-Кумыр' },
+  { value: 'kant', label: 'Кант' },
+  { value: 'isfana', label: 'Исфана' },
+  { value: 'mailuu_suu', label: 'Майлуу-Суу' },
+  { value: 'kara_suu', label: 'Кара-Суу' },
+  { value: 'other', label: 'Другой город' },
+]
 
 export default function Survey() {
   const navigate = useNavigate()
@@ -19,12 +39,16 @@ export default function Survey() {
   const [subjects, setSubjects] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(true)
   const [loadingSubmit, setLoadingSubmit] = useState(false)
+  const [loadingLatest, setLoadingLatest] = useState(true)
   const [error, setError] = useState('')
 
   const [ortScore, setOrtScore] = useState('')
   const [budgetMax, setBudgetMax] = useState('')
-  const [city, setCity] = useState('')
+  const [city, setCity] = useState<City | ''>('')
   const [language, setLanguage] = useState<Language | ''>('')
+  const [notes, setNotes] = useState('')
+  const [needsDorm, setNeedsDorm] = useState(false)
+  const [willingToRelocate, setWillingToRelocate] = useState(false)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
 
   useEffect(() => {
@@ -47,6 +71,29 @@ export default function Survey() {
     load()
   }, [])
 
+  useEffect(() => {
+    async function loadLatest() {
+      setLoadingLatest(true)
+      try {
+        const result = await getLatestSurvey()
+        const s = result.submission
+        setOrtScore(String(s.ort_score))
+        setBudgetMax(s.budget_max != null ? String(s.budget_max) : '')
+        setCity((s.city as City) || '')
+        setLanguage((s.language as Language) || '')
+        setNotes(s.notes || '')
+        setNeedsDorm(s.needs_dorm ?? false)
+        setWillingToRelocate(s.willing_to_relocate ?? false)
+        setSelectedTagIds(result.submission.tag_ids || [])
+      } catch {
+        // 404 or error — leave form empty
+      } finally {
+        setLoadingLatest(false)
+      }
+    }
+    loadLatest()
+  }, [])
+
   function toggleTag(id: number) {
     setSelectedTagIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -57,8 +104,8 @@ export default function Survey() {
     e.preventDefault()
     setError('')
     const ort = parseInt(ortScore, 10)
-    if (Number.isNaN(ort) || ort < 0 || ort > 300) {
-      setError('Укажите балл ОРТ от 0 до 300')
+    if (Number.isNaN(ort) || ort < 0 || ort > 245) {
+      setError('Укажите балл ОРТ от 0 до 245')
       return
     }
     setLoadingSubmit(true)
@@ -66,13 +113,15 @@ export default function Survey() {
       const payload: SurveyPayload = {
         ort_score: ort,
         budget_max: budgetMax ? parseInt(budgetMax, 10) || null : null,
-        city: city.trim() || null,
+        city: city || null,
         language: language || null,
+        notes: notes.trim() || null,
+        needs_dorm: needsDorm,
+        willing_to_relocate: willingToRelocate,
         answers: {},
         tag_ids: selectedTagIds,
       }
       const result = await submitSurvey(payload)
-      localStorage.setItem(RESULTS_KEY, JSON.stringify(result))
       navigate('/results', { state: result })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка отправки')
@@ -81,7 +130,7 @@ export default function Survey() {
     }
   }
 
-  if (loadingTags) {
+  if (loadingTags || loadingLatest) {
     return <p className={styles.loading}>Загрузка опроса…</p>
   }
 
@@ -94,11 +143,11 @@ export default function Survey() {
         <section className={styles.section}>
           <h2>Балл ОРТ и условия</h2>
           <label>
-            Балл ОРТ (0–300)
+            Балл ОРТ (0–245)
             <input
               type="number"
               min={0}
-              max={300}
+              max={245}
               value={ortScore}
               onChange={(e) => setOrtScore(e.target.value)}
               required
@@ -118,13 +167,18 @@ export default function Survey() {
           </label>
           <label>
             Город
-            <input
-              type="text"
+            <select
               value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Бишкек"
+              onChange={(e) => setCity((e.target.value as City) || '')}
               className={styles.input}
-            />
+            >
+              <option value="">— выбрать —</option>
+              {CITIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Язык обучения
@@ -140,6 +194,34 @@ export default function Survey() {
                 </option>
               ))}
             </select>
+          </label>
+          <label>
+            Примечания
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Например: Хочу IT"
+              className={styles.input}
+            />
+          </label>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={needsDorm}
+              onChange={(e) => setNeedsDorm(e.target.checked)}
+              className={styles.checkbox}
+            />
+            Нужна общага
+          </label>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={willingToRelocate}
+              onChange={(e) => setWillingToRelocate(e.target.checked)}
+              className={styles.checkbox}
+            />
+            Готов к переезду
           </label>
         </section>
 
@@ -198,5 +280,3 @@ export default function Survey() {
     </div>
   )
 }
-
-export { RESULTS_KEY }

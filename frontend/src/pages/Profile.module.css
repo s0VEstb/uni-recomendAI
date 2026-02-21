@@ -1,0 +1,24 @@
+.wrap {
+  width: 100%;
+}
+
+.title {
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.link {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

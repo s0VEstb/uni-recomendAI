@@ -12,88 +12,91 @@ from app.db.models.fee_and_admission import ProgramFee, ProgramAdmission
 
 YEAR = 2026
 
+# 10 университетов Кыргызстана
 UNIS = [
-    {
-        "name": "Kyrgyz State Technical University",
-        "city": "Bishkek",
-        "website": "https://kstu.kg",
-        "contacts": {},
-    },
-    {
-        "name": "American University of Central Asia",
-        "city": "Bishkek",
-        "website": "https://auca.kg",
-        "contacts": {},
-    },
-    {
-        "name": "Osh State University",
-        "city": "Osh",
-        "website": "https://oshsu.kg",
-        "contacts": {},
-    },
+    {"name": "Кыргызский государственный технический университет им. И. Раззакова", "city": "Бишкек", "website": "https://kstu.kg", "contacts": {}},
+    {"name": "Американский университет в Центральной Азии", "city": "Бишкек", "website": "https://auca.kg", "contacts": {}},
+    {"name": "Ошский государственный университет", "city": "Ош", "website": "https://oshsu.kg", "contacts": {}},
+    {"name": "Бишкекский государственный университет", "city": "Бишкек", "website": "https://bsu.kg", "contacts": {}},
+    {"name": "Кыргызский национальный университет им. Ж. Баласагына", "city": "Бишкек", "website": "https://knu.kg", "contacts": {}},
+    {"name": "Кыргызский государственный университет строительства, транспорта и архитектуры", "city": "Бишкек", "website": "https://ksucta.kg", "contacts": {}},
+    {"name": "Джалал-Абадский государственный университет", "city": "Джалал-Абад", "website": "https://jasu.kg", "contacts": {}},
+    {"name": "Баткенский государственный университет", "city": "Баткен", "website": "https://basu.kg", "contacts": {}},
+    {"name": "Нарынский государственный университет", "city": "Нарын", "website": "https://nsu.kg", "contacts": {}},
+    {"name": "Иссык-Кульский государственный университет им. К. Тыныстанова", "city": "Каракол", "website": "https://iksu.kg", "contacts": {}},
+    # +5 университетов
+    {"name": "Кыргызско-Турецкий университет «Манас»", "city": "Бишкек", "website": "https://manas.edu.kg", "contacts": {}},
+    {"name": "Кыргызско-Российский Славянский университет", "city": "Бишкек", "website": "https://krsu.edu.kg", "contacts": {}},
+    {"name": "Ошский технологический университет", "city": "Ош", "website": "https://ostu.kg", "contacts": {}},
+    {"name": "Кыргызская государственная медицинская академия им. И. Ахунбаева", "city": "Бишкек", "website": "https://kgma.kg", "contacts": {}},
+    {"name": "Университет Центральной Азии", "city": "Нарын", "website": "https://ucentralasia.org", "contacts": {}},
 ]
 
+# Программы с весами тегов: [(slug, weight), ...] — чем выше weight, тем больше вклад в score.
+# raw_score = budget_ok(1.0) + tag_sum + ort(1.0). Макс. программа = 100%, остальные — % от неё.
 PROGRAMS = [
-    {
-        "uni_website": "https://kstu.kg",
-        "name": "Software Engineering",
-        "language": Language.ru,
-        "study_form": StudyForm.full_time,
-        "duration_years": 4,
-        "official_url": "https://kstu.kg/programs/software-engineering",
-        "fee": 55000,
-        "currency": Currency.KGS,
-        "ort_min": 150,
-        "tag_slugs": ["programming", "computer_science"],
-    },
-    {
-        "uni_website": "https://kstu.kg",
-        "name": "Information Systems",
-        "language": Language.ru,
-        "study_form": StudyForm.full_time,
-        "duration_years": 4,
-        "official_url": "https://kstu.kg/programs/information-systems",
-        "fee": 50000,
-        "currency": Currency.KGS,
-        "ort_min": 145,
-        "tag_slugs": ["programming", "computer_science"],
-    },
-    {
-        "uni_website": "https://auca.kg",
-        "name": "Computer Science",
-        "language": Language.en,
-        "study_form": StudyForm.full_time,
-        "duration_years": 4,
-        "official_url": "https://auca.kg/en/academics/cs",
-        "fee": 120000,
-        "currency": Currency.KGS,
-        "ort_min": 160,
-        "tag_slugs": ["programming", "computer_science", "mathematics"],
-    },
-    {
-        "uni_website": "https://auca.kg",
-        "name": "Applied Mathematics",
-        "language": Language.en,
-        "study_form": StudyForm.full_time,
-        "duration_years": 4,
-        "official_url": "https://auca.kg/en/academics/applied-math",
-        "fee": 110000,
-        "currency": Currency.KGS,
-        "ort_min": 155,
-        "tag_slugs": ["mathematics"],
-    },
-    {
-        "uni_website": "https://oshsu.kg",
-        "name": "Computer Engineering",
-        "language": Language.ru,
-        "study_form": StudyForm.full_time,
-        "duration_years": 4,
-        "official_url": "https://oshsu.kg/programs/computer-engineering",
-        "fee": 45000,
-        "currency": Currency.KGS,
-        "ort_min": 140,
-        "tag_slugs": ["programming", "computer_science"],
-    },
+    # KSTU — 4 программы
+    {"uni_website": "https://kstu.kg", "name": "Программная инженерия", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://kstu.kg/prog/se", "fee": 55000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("programming", 1.2), ("computer_science", 1.0), ("mathematics", 0.8)]},
+    {"uni_website": "https://kstu.kg", "name": "Информационные системы", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://kstu.kg/prog/is", "fee": 50000, "currency": Currency.KGS, "ort_min": 145, "tag_slugs": [("programming", 1.0), ("computer_science", 1.0)]},
+    {"uni_website": "https://kstu.kg", "name": "Автоматизация и управление", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://kstu.kg/prog/au", "fee": 48000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("physics", 0.6), ("mathematics", 1.0)]},
+    {"uni_website": "https://kstu.kg", "name": "Строительство", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://kstu.kg/prog/st", "fee": 42000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("mathematics", 0.8)]},
+    # AUCA — 4 программы
+    {"uni_website": "https://auca.kg", "name": "Computer Science", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://auca.kg/cs", "fee": 120000, "currency": Currency.KGS, "ort_min": 165, "tag_slugs": [("programming", 1.5), ("computer_science", 1.0), ("mathematics", 1.0)]},
+    {"uni_website": "https://auca.kg", "name": "Applied Mathematics", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://auca.kg/math", "fee": 110000, "currency": Currency.KGS, "ort_min": 160, "tag_slugs": [("mathematics", 1.0)]},
+    {"uni_website": "https://auca.kg", "name": "Business Administration", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://auca.kg/ba", "fee": 115000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("business", 1.0), ("economics", 1.0)]},
+    {"uni_website": "https://auca.kg", "name": "Psychology", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://auca.kg/psy", "fee": 105000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("psychology", 1.0), ("psychology_subject", 0.8)]},
+    # Osh SU — 3 программы
+    {"uni_website": "https://oshsu.kg", "name": "Компьютерная инженерия", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://oshsu.kg/ce", "fee": 45000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("programming", 1.0), ("computer_science", 1.0)]},
+    {"uni_website": "https://oshsu.kg", "name": "Медицина", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 6, "official_url": "https://oshsu.kg/med", "fee": 65000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("medicine", 1.0), ("biology", 1.0)]},
+    {"uni_website": "https://oshsu.kg", "name": "Экономика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://oshsu.kg/eco", "fee": 40000, "currency": Currency.KGS, "ort_min": 130, "tag_slugs": [("economics", 1.0)]},
+    # BSU — 3 программы
+    {"uni_website": "https://bsu.kg", "name": "Программирование", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://bsu.kg/prog", "fee": 52000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("programming", 1.2), ("computer_science", 0.8)]},
+    {"uni_website": "https://bsu.kg", "name": "Дизайн", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://bsu.kg/design", "fee": 48000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("design", 1.0), ("creativity", 0.8)]},
+    {"uni_website": "https://bsu.kg", "name": "Журналистика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://bsu.kg/jour", "fee": 44000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("writing", 1.0), ("communication", 0.6)]},
+    # KNU — 4 программы
+    {"uni_website": "https://knu.kg", "name": "Информатика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://knu.kg/inf", "fee": 58000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("computer_science", 1.0), ("mathematics", 1.0)]},
+    {"uni_website": "https://knu.kg", "name": "Математика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://knu.kg/math", "fee": 50000, "currency": Currency.KGS, "ort_min": 160, "tag_slugs": [("mathematics", 1.0)]},
+    {"uni_website": "https://knu.kg", "name": "История", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://knu.kg/hist", "fee": 42000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("history", 1.0), ("history_subject", 0.8)]},
+    {"uni_website": "https://knu.kg", "name": "Филология", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://knu.kg/phil", "fee": 45000, "currency": Currency.KGS, "ort_min": 145, "tag_slugs": [("literature", 0.8), ("foreign_languages", 0.8)]},
+    # KSUCTA — 3 программы
+    {"uni_website": "https://ksucta.kg", "name": "Архитектура", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 5, "official_url": "https://ksucta.kg/arch", "fee": 62000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("design", 1.0), ("creativity", 0.8), ("art", 0.6)]},
+    {"uni_website": "https://ksucta.kg", "name": "Строительство", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ksucta.kg/build", "fee": 50000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("mathematics", 0.8)]},
+    {"uni_website": "https://ksucta.kg", "name": "Транспорт", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ksucta.kg/trans", "fee": 48000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("physics", 0.6)]},
+    # JASU — 3 программы
+    {"uni_website": "https://jasu.kg", "name": "Программирование", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://jasu.kg/prog", "fee": 38000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("programming", 1.0), ("computer_science", 0.8)]},
+    {"uni_website": "https://jasu.kg", "name": "Педагогика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://jasu.kg/ped", "fee": 32000, "currency": Currency.KGS, "ort_min": 130, "tag_slugs": [("communication", 0.8)]},
+    {"uni_website": "https://jasu.kg", "name": "Агрономия", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://jasu.kg/agro", "fee": 35000, "currency": Currency.KGS, "ort_min": 125, "tag_slugs": [("biology", 0.8)]},
+    # BASU — 2 программы
+    {"uni_website": "https://basu.kg", "name": "Программирование", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://basu.kg/prog", "fee": 35000, "currency": Currency.KGS, "ort_min": 140, "tag_slugs": [("programming", 0.8), ("computer_science", 0.8)]},
+    {"uni_website": "https://basu.kg", "name": "Экономика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://basu.kg/eco", "fee": 32000, "currency": Currency.KGS, "ort_min": 125, "tag_slugs": [("economics", 0.8)]},
+    # NSU — 2 программы
+    {"uni_website": "https://nsu.kg", "name": "Программирование", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://nsu.kg/prog", "fee": 36000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("programming", 0.8), ("computer_science", 0.6)]},
+    {"uni_website": "https://nsu.kg", "name": "Педагогика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://nsu.kg/ped", "fee": 30000, "currency": Currency.KGS, "ort_min": 120, "tag_slugs": [("communication", 0.6)]},
+    # IKSU — 3 программы
+    {"uni_website": "https://iksu.kg", "name": "Туризм", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://iksu.kg/tour", "fee": 42000, "currency": Currency.KGS, "ort_min": 130, "tag_slugs": [("travel", 1.0), ("languages", 0.6)]},
+    {"uni_website": "https://iksu.kg", "name": "Экология", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://iksu.kg/eco", "fee": 40000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("biology", 0.8), ("chemistry", 0.6)]},
+    {"uni_website": "https://iksu.kg", "name": "Экономика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://iksu.kg/econ", "fee": 38000, "currency": Currency.KGS, "ort_min": 128, "tag_slugs": [("economics", 0.8)]},
+    # КТУ Манас — 4 программы (турецкий/русский)
+    {"uni_website": "https://manas.edu.kg", "name": "Программная инженерия", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://manas.edu.kg/se", "fee": 65000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("programming", 1.2), ("computer_science", 1.0), ("mathematics", 0.8)]},
+    {"uni_website": "https://manas.edu.kg", "name": "Международные отношения", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://manas.edu.kg/ir", "fee": 60000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("history", 0.8), ("foreign_languages", 1.0)]},
+    {"uni_website": "https://manas.edu.kg", "name": "Турецкий язык и литература", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://manas.edu.kg/turk", "fee": 55000, "currency": Currency.KGS, "ort_min": 145, "tag_slugs": [("foreign_languages", 1.0), ("literature", 0.8)]},
+    {"uni_website": "https://manas.edu.kg", "name": "Экономика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://manas.edu.kg/eco", "fee": 58000, "currency": Currency.KGS, "ort_min": 148, "tag_slugs": [("economics", 1.0), ("business", 0.8)]},
+    # КРСУ — 3 программы
+    {"uni_website": "https://krsu.edu.kg", "name": "Информатика и вычислительная техника", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://krsu.edu.kg/ivt", "fee": 60000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("programming", 1.0), ("computer_science", 1.0), ("mathematics", 0.8)]},
+    {"uni_website": "https://krsu.edu.kg", "name": "Юриспруденция", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://krsu.edu.kg/law", "fee": 55000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("critical_thinking", 0.8), ("communication", 0.6)]},
+    {"uni_website": "https://krsu.edu.kg", "name": "Журналистика", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://krsu.edu.kg/jour", "fee": 50000, "currency": Currency.KGS, "ort_min": 145, "tag_slugs": [("writing", 1.0), ("communication", 0.8)]},
+    # ОшТУ — 3 программы
+    {"uni_website": "https://ostu.kg", "name": "Программирование", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ostu.kg/prog", "fee": 42000, "currency": Currency.KGS, "ort_min": 145, "tag_slugs": [("programming", 1.0), ("computer_science", 0.8)]},
+    {"uni_website": "https://ostu.kg", "name": "Пищевые технологии", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ostu.kg/food", "fee": 38000, "currency": Currency.KGS, "ort_min": 130, "tag_slugs": [("chemistry", 0.8), ("cooking", 0.6)]},
+    {"uni_website": "https://ostu.kg", "name": "Строительство", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ostu.kg/build", "fee": 40000, "currency": Currency.KGS, "ort_min": 135, "tag_slugs": [("mathematics", 0.8)]},
+    # КГМА — 3 программы
+    {"uni_website": "https://kgma.kg", "name": "Лечебное дело", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 6, "official_url": "https://kgma.kg/med", "fee": 85000, "currency": Currency.KGS, "ort_min": 170, "tag_slugs": [("medicine", 1.2), ("biology", 1.0), ("chemistry", 0.8)]},
+    {"uni_website": "https://kgma.kg", "name": "Стоматология", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 5, "official_url": "https://kgma.kg/dent", "fee": 90000, "currency": Currency.KGS, "ort_min": 168, "tag_slugs": [("medicine", 1.0), ("biology", 1.0)]},
+    {"uni_website": "https://kgma.kg", "name": "Фармация", "language": Language.ru, "study_form": StudyForm.full_time, "duration_years": 5, "official_url": "https://kgma.kg/pharm", "fee": 75000, "currency": Currency.KGS, "ort_min": 160, "tag_slugs": [("chemistry", 1.0), ("biology", 0.8)]},
+    # UCA — 3 программы (англ.)
+    {"uni_website": "https://ucentralasia.org", "name": "Computer Science", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ucentralasia.org/cs", "fee": 95000, "currency": Currency.KGS, "ort_min": 160, "tag_slugs": [("programming", 1.2), ("computer_science", 1.0), ("mathematics", 0.8)]},
+    {"uni_website": "https://ucentralasia.org", "name": "Economics", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ucentralasia.org/econ", "fee": 90000, "currency": Currency.KGS, "ort_min": 155, "tag_slugs": [("economics", 1.0), ("business", 0.8)]},
+    {"uni_website": "https://ucentralasia.org", "name": "Communications and Media", "language": Language.en, "study_form": StudyForm.full_time, "duration_years": 4, "official_url": "https://ucentralasia.org/comm", "fee": 85000, "currency": Currency.KGS, "ort_min": 150, "tag_slugs": [("communication", 1.0), ("writing", 0.8)]},
 ]
 
 

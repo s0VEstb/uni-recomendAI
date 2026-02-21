@@ -55,18 +55,37 @@ export function listTags(tagType?: TagType): Promise<Tag[]> {
 
 export type Language = 'russian' | 'kyrgyz' | 'english' | 'turkish'
 
+export type City = 'bishkek' | 'osh' | 'jalal_abad' | 'karakol' | 'tokmok' | 'naryn' | 'batken' | 'talas' | 'uzgen' | 'kara_balta' | 'balykchy' | 'bazar_korgon' | 'kyzyl_kiya' | 'tash_kumyr' | 'kant' | 'isfana' | 'mailuu_suu' | 'kara_suu' | 'other'
+
 export interface SurveyPayload {
   ort_score: number
   budget_max?: number | null
-  city?: string | null
+  city?: City | null
   language?: Language | null
+  notes?: string | null
+  needs_dorm?: boolean | null
+  willing_to_relocate?: boolean | null
   answers: Record<string, unknown>
   tag_ids: number[]
 }
 
+export interface SurveySubmissionData {
+  id: number
+  user_id: number
+  ort_score: number
+  budget_max: number | null
+  city: string | null
+  language: string | null
+  notes: string | null
+  needs_dorm: boolean | null
+  willing_to_relocate: boolean | null
+  answers: Record<string, unknown>
+  tag_ids?: number[]
+}
+
 export interface SurveySubmitResult {
   message: string
-  submission: { id: number; user_id: number; ort_score: number; budget_max: number | null; city: string | null; language: string | null; answers: Record<string, unknown> }
+  submission: SurveySubmissionData
   universities_top: UniversityTop[]
 }
 
@@ -89,4 +108,8 @@ export function submitSurvey(payload: SurveyPayload): Promise<SurveySubmitResult
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export function getLatestSurvey(): Promise<SurveySubmitResult> {
+  return api<SurveySubmitResult>('/survey/latest')
 }
