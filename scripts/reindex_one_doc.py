@@ -5,7 +5,7 @@ import asyncio
 
 
 async def main():
-    document_id = 1  # <-- поставь реальный ID документа AUCA main.txt
+    document_id = 1  
 
     async with AsyncSessionLocal() as db:
         indexer = RagIndexer()

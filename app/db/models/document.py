@@ -84,4 +84,4 @@ class DocumentChunk(TimestampMixin, Base):
     )
 
     def __repr__(self):
-        return f"Chunk of {self.document.title} (pages {self.page_start}-{self.page_end})"
+        return f"Chunk of {self.id}(pages {self.page_start}-{self.page_end})"
