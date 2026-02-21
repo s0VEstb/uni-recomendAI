@@ -249,23 +249,40 @@ async def upsert_admission(
         adm.source_page_end = 1
 
 
-async def ensure_program_tags(db: AsyncSession, program_id: int, slugs: list[str]) -> None:
+def _normalize_tag_slugs(slugs: list[str] | list[tuple[str, float]]) -> list[tuple[str, float]]:
+    """Превращает [slug, ...] или [(slug, weight), ...] в [(slug, weight), ...]"""
     if not slugs:
+        return []
+    out: list[tuple[str, float]] = []
+    for item in slugs:
+        if isinstance(item, str):
+            out.append((item, 1.0))
+        else:
+            out.append((item[0], float(item[1])))
+    return out
+
+
+async def ensure_program_tags(db: AsyncSession, program_id: int, slugs: list[str] | list[tuple[str, float]]) -> None:
+    items = _normalize_tag_slugs(slugs)
+    if not items:
         return
 
-    tags = (await db.execute(select(Tag).where(Tag.slug.in_(slugs)))).scalars().all()
+    slugs_list = [s for s, _ in items]
+    tags = (await db.execute(select(Tag).where(Tag.slug.in_(slugs_list)))).scalars().all()
     tags_by_slug = {t.slug: t for t in tags}
 
-    missing = [s for s in slugs if s not in tags_by_slug]
+    missing = [s for s in slugs_list if s not in tags_by_slug]
     if missing:
         raise RuntimeError(f"Missing tags in DB (run seed_tags first): {missing}")
 
-    for slug in slugs:
+    for slug, weight in items:
         tag = tags_by_slug[slug]
         q = select(ProgramTag).where(ProgramTag.program_id == program_id, ProgramTag.tag_id == tag.id)
         link = (await db.execute(q)).scalar_one_or_none()
         if not link:
-            db.add(ProgramTag(program_id=program_id, tag_id=tag.id, weight=1.0))
+            db.add(ProgramTag(program_id=program_id, tag_id=tag.id, weight=weight))
+        else:
+            link.weight = weight
 
 
 async def seed(db: AsyncSession) -> None:
@@ -311,7 +328,7 @@ async def seed(db: AsyncSession) -> None:
                 source_document_id=adm_docs[uni.id].id,
             )
 
-            await ensure_program_tags(db, program.id, p.get("tag_slugs", []))
+            await ensure_program_tags(db, program.id, p.get("tag_slugs", []))  # [(slug, weight), ...]
 
     await db.commit()
 
