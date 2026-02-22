@@ -24,8 +24,7 @@ class NullLLMProvider(BaseLLMProvider):
 class GeminiLLMProvider(BaseLLMProvider):
     def __init__(self) -> None:
         self.api_key = os.getenv("GEMINI_API_KEY")
-        # Важно: если gemini-2.5-flash еще не вышла, используйте gemini-2.0-flash
-        self.model = os.getenv("GEMINI_MODEL") or "gemini-2.5-flash"
+        self.model = os.getenv("GEMINI_MODEL")
 
         if not self.api_key:
             raise RuntimeError("GEMINI_API_KEY is not set")
@@ -34,7 +33,7 @@ class GeminiLLMProvider(BaseLLMProvider):
         self.client = genai.Client(api_key=self.api_key)
 
     @staticmethod
-    def _build_context(snippets: List[Dict[str, Any]], max_snippets: int = 3, max_chars_each: int = 600) -> str:
+    def _build_context(snippets: List[Dict[str, Any]], max_snippets: int = 4, max_chars_each: int = 800) -> str:
         blocks = []
         for i, sn in enumerate(snippets[:max_snippets], start=1):
             src = sn.get("source", {})
@@ -51,8 +50,7 @@ class GeminiLLMProvider(BaseLLMProvider):
 1) Отвечай ТОЛЬКО по контексту из источников ниже.
 2) Если точного ответа в контексте нет, ответь ровно: Не найдено в источниках.
 3) Не придумывай факты.
-4) Если вопрос про числа (стоимость, баллы, дедлайны) — указывай только найденные числа.
-5) Отвечай кратко, без лишней "воды".
+4) Отвечай по факту, как оно есть.
 
 Вопрос:
 {question}
