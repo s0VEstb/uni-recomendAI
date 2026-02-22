@@ -6,6 +6,7 @@ from typing import Optional, List
 from datetime import datetime
 from sqlalchemy import DateTime, func
 from app.db.enums import DocumentType
+from pgvector.sqlalchemy import Vector
 
 
 class Document(TimestampMixin, Base):
@@ -63,14 +64,24 @@ class DocumentChunk(TimestampMixin, Base):
     page_end: Mapped[int] = mapped_column(Integer, nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # For MVP SQLite: store embedding as JSON list[float]
+    # NEW: порядок чанка в документе
+    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0, index=True)
+
+    # NEW: какой моделью посчитан эмбеддинг
+    embedding_model: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+
+    # NEW: pgvector (384 размерность для paraphrase-multilingual-MiniLM-L12-v2)
+    embedding_vector: Mapped[Optional[list[float]]] = mapped_column(Vector(384), nullable=True)
+
+    # Старое поле можно оставить на время перехода (опционально)
     embedding: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
 
     document: Mapped["Document"] = relationship(back_populates="chunks")
 
     __table_args__ = (
         Index("ix_doc_chunks_doc_pages", "document_id", "page_start", "page_end"),
+        Index("ix_doc_chunks_doc_chunk_index", "document_id", "chunk_index"),
     )
 
     def __repr__(self):
-        return f"Chunk of {self.document.title} (pages {self.page_start}-{self.page_end})"
+        return f"Chunk of {self.id}(pages {self.page_start}-{self.page_end})"
