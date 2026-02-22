@@ -50,6 +50,27 @@ class RagChatService:
     @staticmethod
     def _clean_text(text: str, limit: int = 900) -> str:
         return " ".join((text or "").split())[:limit]
+    
+    @staticmethod
+    def _is_score_question(question: str) -> bool:
+        q = (question or "").lower()
+        markers = [
+            "балл", "баллы", "проход", "проходной", "минимальн", "минимум",
+            "score", "scores", "scoring", "minimum", "cutoff", "cut-off",
+            "sat", "act", "орт", "ort"
+        ]
+        return any(m in q for m in markers)
+
+    @staticmethod
+    def _effective_top_k(question: str, user_top_k: int) -> int:
+        """
+        Пользовательский top_k остаётся базой, но для числовых/табличных вопросов
+        повышаем recall, чтобы не потерять нужный документ на 5–8 местах.
+        """
+        base = max(1, int(user_top_k or 5))
+        if RagChatService._is_score_question(question):
+            return max(base, 8)  # можно 8 или 10
+        return base
 
     async def _get_program_context(self, db: AsyncSession, program_id: int, year: int | None = None) -> dict | None:
         result = await db.execute(
@@ -149,7 +170,8 @@ class RagChatService:
         qv = self.embedder.embed_text(question)
         t1 = time.perf_counter()
         
-        rows = await retrieve_chunks_pgvector(db, qv, top_k, university_id, year, document_id)
+        effective_top_k = self._effective_top_k(question, top_k)
+        rows = await retrieve_chunks_pgvector(db, qv, effective_top_k, university_id, year, document_id)
         t2 = time.perf_counter()
         
         sources, snippets = self._rows_to_sources_and_snippets(rows)
