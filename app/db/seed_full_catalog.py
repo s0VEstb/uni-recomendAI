@@ -24,7 +24,6 @@ UNIS = [
     {"name": "Баткенский государственный университет", "city": "Баткен", "website": "https://basu.kg", "contacts": {}},
     {"name": "Нарынский государственный университет", "city": "Нарын", "website": "https://nsu.kg", "contacts": {}},
     {"name": "Иссык-Кульский государственный университет им. К. Тыныстанова", "city": "Каракол", "website": "https://iksu.kg", "contacts": {}},
-    # +5 университетов
     {"name": "Кыргызско-Турецкий университет «Манас»", "city": "Бишкек", "website": "https://manas.edu.kg", "contacts": {}},
     {"name": "Кыргызско-Российский Славянский университет", "city": "Бишкек", "website": "https://krsu.edu.kg", "contacts": {}},
     {"name": "Ошский технологический университет", "city": "Ош", "website": "https://ostu.kg", "contacts": {}},
@@ -100,19 +99,26 @@ PROGRAMS = [
 ]
 
 
+def _photo_url_for_uni(website: str) -> str:
+    """Placeholder: уникальное фото по website (можно заменить на реальные URL)."""
+    seed = hash(website) % 1000
+    return f"https://picsum.photos/seed/uni{seed}/160/120"
+
 async def upsert_universities(db: AsyncSession) -> dict[str, University]:
     res = await db.execute(select(University))
     existing = {u.website: u for u in res.scalars().all()}
 
     for u in UNIS:
         website = u["website"]
+        photo_url = u.get("photo_url") or _photo_url_for_uni(website)
         if website in existing:
             uni = existing[website]
             uni.name = u["name"]
             uni.city = u["city"]
             uni.contacts = u.get("contacts", {})
+            uni.photo_url = photo_url
         else:
-            uni = University(**u)
+            uni = University(**u, photo_url=photo_url)
             db.add(uni)
             existing[website] = uni
 

@@ -19,6 +19,7 @@ class ProgramOut(BaseModel):
 class UniversityOut(BaseModel):
     id: int
     name: str
+    photo_url: str | None = None
     model_config = {"from_attributes": True}
 
 
