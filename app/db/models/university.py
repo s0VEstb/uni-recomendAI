@@ -13,6 +13,7 @@ class University(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     city: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     website: Mapped[str] = mapped_column(String(512), nullable=False, unique=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     contacts: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
 

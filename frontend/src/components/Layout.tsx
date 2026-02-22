@@ -26,6 +26,7 @@ export default function Layout() {
               <Link to="/profile">Профиль</Link>
               <Link to="/survey">Опрос</Link>
               <Link to="/results">Мои результаты</Link>
+              <Link to="/chat">Чат с ИИ</Link>
               <button type="button" onClick={logout} className={styles.logout}>
                 Выйти
               </button>

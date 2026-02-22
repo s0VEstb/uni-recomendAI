@@ -90,7 +90,7 @@ export interface SurveySubmitResult {
 }
 
 export interface UniversityTop {
-  university: { id: number; name: string }
+  university: { id: number; name: string; photo_url?: string | null }
   score: number
   programs_count: number
   programs: ProgramRecommendation[]
@@ -112,4 +112,96 @@ export function submitSurvey(payload: SurveyPayload): Promise<SurveySubmitResult
 
 export function getLatestSurvey(): Promise<SurveySubmitResult> {
   return api<SurveySubmitResult>('/survey/latest')
+}
+
+export interface ProgramDetail {
+  id: number
+  name: string
+  language: string
+  study_form: string
+  duration_years: number
+  official_url: string | null
+  university: {
+    id: number
+    name: string
+    city: string
+    website: string
+    photo_url: string | null
+  }
+  fees: { id: number; name: string; year: number; contract_fee: number; currency: string }[]
+  admissions: { id: number; year: number; ort_min_score: number | null; requirements: Record<string, unknown>; deadlines: Record<string, unknown> }[]
+  tags: { id: number; slug: string; title: string }[]
+}
+
+export function getProgramDetail(universityId: number, programId: number): Promise<ProgramDetail> {
+  return api<ProgramDetail>(`/universities/${universityId}/programs/${programId}`)
+}
+
+export interface ChatStreamCallbacks {
+  onMetadata?: (meta: { sources: unknown[]; found: boolean }) => void
+  onChunk?: (text: string) => void
+  onDone?: () => void
+  onError?: (err: Error) => void
+}
+
+export async function chatStream(
+  question: string,
+  options?: { university_id?: number; program_id?: number; top_k?: number },
+  callbacks?: ChatStreamCallbacks
+): Promise<void> {
+  const token = localStorage.getItem('token')
+  const res = await fetch('/api/chat/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      question,
+      university_id: options?.university_id ?? null,
+      program_id: options?.program_id ?? null,
+      top_k: options?.top_k ?? 4,
+    }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }))
+    callbacks?.onError?.(new Error(typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)))
+    return
+  }
+  const reader = res.body?.getReader()
+  if (!reader) {
+    callbacks?.onError?.(new Error('No response body'))
+    return
+  }
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let metadataDone = false
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      const chunk = decoder.decode(value, { stream: true })
+      buffer += chunk
+      if (!metadataDone && buffer.includes('--METADATA_END--')) {
+        const idx = buffer.indexOf('--METADATA_END--')
+        const metaStr = buffer.slice(0, idx).trim()
+        metadataDone = true
+        try {
+          const meta = JSON.parse(metaStr)
+          callbacks?.onMetadata?.(meta)
+        } catch {
+          /* ignore */
+        }
+        const afterMeta = buffer.slice(idx + '--METADATA_END--\n'.length)
+        if (afterMeta) callbacks?.onChunk?.(afterMeta)
+        buffer = ''
+      } else if (metadataDone && chunk) {
+        callbacks?.onChunk?.(chunk)
+      }
+    }
+    if (metadataDone && buffer) callbacks?.onChunk?.(buffer)
+    callbacks?.onDone?.()
+  } catch (e) {
+    callbacks?.onError?.(e instanceof Error ? e : new Error(String(e)))
+  }
 }

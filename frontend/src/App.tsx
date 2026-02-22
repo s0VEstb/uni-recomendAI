@@ -6,6 +6,8 @@ import Register from './pages/Register'
 import Survey from './pages/Survey'
 import Results from './pages/Results'
 import Profile from './pages/Profile'
+import Chat from './pages/Chat'
+import ProgramDetail from './pages/ProgramDetail'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -65,6 +67,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="universities/:universityId/programs/:programId"
+          element={
+            <ProtectedRoute>
+              <ProgramDetail />
             </ProtectedRoute>
           }
         />

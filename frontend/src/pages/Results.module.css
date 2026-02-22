@@ -43,6 +43,44 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
   }
+
+  .cardContent {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .photoWrap {
+    flex-shrink: 0;
+  }
+
+  .photo {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  .uniInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chatButton {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .chatButton:hover {
+    background: var(--accent-hover);
+  }
   
   .uniName {
     margin: 0 0 0.35rem;
@@ -72,6 +110,13 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     min-width: 160px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .programCard:hover {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.08);
   }
   
   .programName {
