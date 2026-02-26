@@ -1,4 +1,4 @@
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.university import Program
@@ -50,41 +50,47 @@ class RecommendationRepo:
         # базовый query: Program + University
         if tag_ids:
             q = (
-                select(Program, University, ProgramTag.weight)
+                select(Program, University, ProgramTag.weight, ProgramFee.contract_fee, ProgramAdmission.ort_min_score)
                 .join(University, Program.university_id == University.id)
                 .join(ProgramTag, ProgramTag.program_id == Program.id)
                 .where(ProgramTag.tag_id.in_(tag_ids))
             )
         else:
             q = (
-                select(Program, University)
+                select(Program, University, ProgramFee.contract_fee, ProgramAdmission.ort_min_score)
                 .join(University, Program.university_id == University.id)
             )
 
-        # только активные программы
         q = q.where(Program.is_active == True)
 
-        # 1) фильтр по городу (city != "other")
         if city and city != "other" and city in CITY_TO_DB_NAMES:
-            city_names = CITY_TO_DB_NAMES[city]
-            q = q.where(University.city.in_(city_names))
+            q = q.where(University.city.in_(CITY_TO_DB_NAMES[city]))
 
-        # 2) фильтр по языку обучения
         if language is not None:
             q = q.where(Program.language == language)
 
-        # 3) фильтр по бюджету
-        if budget_max is not None:
-            q = (
-                q.join(ProgramFee, (ProgramFee.program_id == Program.id) & (ProgramFee.year == ADMISSION_YEAR))
-                .where(ProgramFee.contract_fee <= budget_max)
-            )
+        # ✅ fee теперь НЕ обязателен
+        q = q.outerjoin(
+            ProgramFee,
+            and_(ProgramFee.program_id == Program.id, ProgramFee.year == ADMISSION_YEAR),
+        )
 
-        # 4) фильтр по ОРТ: ort_min_score IS NULL или ort_min_score <= ort_score
+        # ✅ admissions уже outerjoin (оставляем)
         q = q.outerjoin(
             ProgramAdmission,
-            (ProgramAdmission.program_id == Program.id) & (ProgramAdmission.year == ADMISSION_YEAR),
+            and_(ProgramAdmission.program_id == Program.id, ProgramAdmission.year == ADMISSION_YEAR),
         )
+
+        # ✅ бюджет: если budget_max задан, то либо fee отсутствует, либо fee <= budget
+        if budget_max is not None:
+            q = q.where(
+                or_(
+                    ProgramFee.contract_fee.is_(None),
+                    ProgramFee.contract_fee <= budget_max,
+                )
+            )
+
+        # ✅ ОРТ: либо нет порога, либо порог <= ort_score
         q = q.where(
             or_(
                 ProgramAdmission.ort_min_score.is_(None),
@@ -98,5 +104,10 @@ class RecommendationRepo:
         rows = res.all()
 
         if tag_ids:
-            return [(r[0], r[1], (r[2] if r[2] is not None else 1.0)) for r in rows]
-        return [(r[0], r[1], 0.0) for r in rows]
+            # (Program, University, tag_weight, fee, ort_min)
+            return [
+                (r[0], r[1], (r[2] if r[2] is not None else 1.0), r[3], r[4])
+                for r in rows
+            ]
+        # (Program, University, fee, ort_min)
+        return [(r[0], r[1], 0.0, r[2], r[3]) for r in rows]

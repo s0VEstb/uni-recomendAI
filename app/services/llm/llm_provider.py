@@ -120,7 +120,10 @@ class GeminiLLMProvider(BaseLLMProvider):
             # сортировка: bonus ↑, distance ↓(т.е. -dist ↑)
             ranked.append((bonus, -dist, sn))
 
-        ranked.sort(reverse=True)
+        ranked.sort(
+            key=lambda t: (int(t[0] or 0), float(t[1] or -9999.0)),
+            reverse=True
+        )   
 
         selected: List[Dict[str, Any]] = []
         seen_docs = set()

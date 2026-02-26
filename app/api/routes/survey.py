@@ -19,8 +19,8 @@ async def submit_survey(
     service = SurveyService(db, SurveyRepo(db))
     submission, recommendations = await service.submit(user_id=user_id, data=payload)
 
-    universities_top = service.rec_service.build_universities_top(recommendations, limit=5)
-    message = service.rec_service.build_message(universities_top, top_n=3)
+    universities_top = service.rec_service.build_universities_top(recommendations, limit=10)
+    message = service.rec_service.build_message(universities_top, top_n=4)
 
     submission_out = SurveySubmissionOut(
         id=submission.id,

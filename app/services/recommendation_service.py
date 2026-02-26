@@ -3,6 +3,7 @@ from app.schemas.recommendation import (
     ProgramOut, UniversityOut, UniversityTopOut
 )
 from app.db.repositories.recommendation_repo import RecommendationRepo
+from app.core.security import ADMISSION_YEAR
 
 # Максимальный балл программы (budget_ok + tag_match + ort_considered)
 MAX_PROGRAM_SCORE = 3.5
@@ -25,27 +26,43 @@ class RecommendationService:
         recs: list[ProgramRecommendationOut] = []
         program_aggregates: dict[int, tuple] = {}  # pid -> (program, uni, tag_sum)
 
-        for program, university, tag_weight in rows:
+        for program, university, tag_weight, fee, ort_min in rows:
             pid = program.id
             if pid not in program_aggregates:
-                program_aggregates[pid] = (program, university, 0.0)
-            _, _, prev_sum = program_aggregates[pid]
-            program_aggregates[pid] = (program, university, prev_sum + tag_weight)
+                program_aggregates[pid] = (program, university, 0.0, fee, ort_min)
+            p, u, prev_sum, prev_fee, prev_ort = program_aggregates[pid]
+            # tag суммируем, fee/ort_min оставляем (они одинаковые для pid в рамках year)
+            program_aggregates[pid] = (p, u, prev_sum + tag_weight, prev_fee, prev_ort)
 
-        temp: list[tuple[object, object, list[RecommendationReason], float]] = []
+        temp = []
 
-        for program, university, tag_sum in program_aggregates.values():
-            reasons: list[RecommendationReason] = []
+        for program, university, tag_sum, fee, ort_min in program_aggregates.values():
+            reasons = []
             raw_score = 0.0
 
+            # budget
             if submission.budget_max is not None:
-                reasons.append(RecommendationReason(
-                    code="budget_ok",
-                    message="Подходит по бюджету",
-                    meta={"budget_max": submission.budget_max},
-                ))
-                raw_score += 1.0
+                if fee is None:
+                    reasons.append(RecommendationReason(
+                        code="fee_unknown",
+                        message="Стоимость контракта пока не указана, поэтому бюджет не смогли проверить",
+                        meta={"budget_max": submission.budget_max, "year": ADMISSION_YEAR},
+                    ))
+                elif fee <= submission.budget_max:
+                    reasons.append(RecommendationReason(
+                        code="budget_ok",
+                        message="Подходит по бюджету",
+                        meta={"budget_max": submission.budget_max, "contract_fee": fee, "year": ADMISSION_YEAR},
+                    ))
+                    raw_score += 1.0
+                else:
+                    reasons.append(RecommendationReason(
+                        code="budget_too_low",
+                        message="Бюджет ниже стоимости контракта",
+                        meta={"budget_max": submission.budget_max, "contract_fee": fee, "year": ADMISSION_YEAR},
+                    ))
 
+            # tags
             if tag_ids:
                 reasons.append(RecommendationReason(
                     code="tag_match",
@@ -54,12 +71,21 @@ class RecommendationService:
                 ))
                 raw_score += tag_sum
 
-            reasons.append(RecommendationReason(
-                code="ort_considered",
-                message="ОРТ учтён при подборе",
-                meta={"ort_score": submission.ort_score},
-            ))
-            raw_score += 1.0
+            # ort
+            # (ты уже отфильтровал в SQL, но reason можно сделать честнее)
+            if ort_min is None:
+                reasons.append(RecommendationReason(
+                    code="ort_unknown_or_not_required",
+                    message="Проходной балл ОРТ не указан или не требуется",
+                    meta={"ort_score": submission.ort_score, "year": ADMISSION_YEAR},
+                ))
+            else:
+                reasons.append(RecommendationReason(
+                    code="ort_ok",
+                    message="Проходите по ОРТ",
+                    meta={"ort_score": submission.ort_score, "ort_min_score": ort_min, "year": ADMISSION_YEAR},
+                ))
+                raw_score += 1.0  # по желанию: давать балл только когда ort_min известен
 
             temp.append((program, university, reasons, raw_score))
 

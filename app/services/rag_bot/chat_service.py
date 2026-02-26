@@ -18,29 +18,6 @@ def _normalize_optional_str(value):
         return None
     return value
 
-def _detect_degree_target(q: str) -> str | None:
-    q = q.lower()
-    if any(k in q for k in ["mba", "магист", "магистр", "master"]):
-        return "master"
-    if any(k in q for k in ["бакалавр", "бакалавриат", "undergrad", "bachelor"]):
-        return "bachelor"
-    return None
-
-def _chunk_matches_degree(text_l: str, degree_target: str | None) -> bool:
-    if degree_target is None:
-        return True
-    master_markers = ["mba", "магист", "магистр", "master", "graduate"]
-    bachelor_markers = ["бакалавр", "бакалавриат", "bachelor", "undergrad", "freshman"]
-
-    if degree_target == "master":
-        if any(m in text_l for m in bachelor_markers) and not any(m in text_l for m in master_markers):
-            return False
-        return any(m in text_l for m in master_markers)
-    if degree_target == "bachelor":
-        if any(m in text_l for m in master_markers) and not any(m in text_l for m in bachelor_markers):
-            return False
-        return any(m in text_l for m in bachelor_markers)
-    return True
 
 class RagChatService:
     def __init__(self) -> None:
@@ -69,7 +46,7 @@ class RagChatService:
         """
         base = max(1, int(user_top_k or 5))
         if RagChatService._is_score_question(question):
-            return max(base, 8)  # можно 8 или 10
+            return max(base, 15)  # можно 8 или 10
         return base
 
     async def _get_program_context(self, db: AsyncSession, program_id: int, year: int | None = None) -> dict | None:

@@ -6,6 +6,7 @@ from passlib.hash import argon2
 JWT_SECRET = "CHANGE_ME"
 JWT_ALG = "HS256"
 ACCESS_TOKEN_EXPIRE_MIN = 60 * 24  # 1 день
+ADMISSION_YEAR = 2026
 
 def hash_password(password: str) -> str:
     return argon2.hash(password)
