@@ -28,7 +28,18 @@ DATABASE_URL = os.getenv(
 
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
+def render_item(type_, obj, autogen_context):
+    if type_ == "type":
+        module = getattr(obj.__class__, "__module__", "")
+        name = getattr(obj.__class__, "__name__", "")
 
+        if module.startswith("pgvector.sqlalchemy") and name.upper() == "VECTOR":
+            autogen_context.imports.add("from pgvector.sqlalchemy import Vector")
+            dim = getattr(obj, "dim", None)
+            if dim is not None:
+                return f"Vector(dim={dim})"
+            return "Vector()"
+    return False
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
@@ -38,6 +49,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_item=render_item,
     )
 
     with context.begin_transaction():
@@ -51,6 +63,7 @@ def do_run_migrations(connection: Connection) -> None:
         compare_type=True,
         compare_server_default=True,
         version_table="alembic_version",
+        render_item=render_item,
     )
 
     with context.begin_transaction():
