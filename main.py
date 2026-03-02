@@ -1,5 +1,11 @@
 from starlette.middleware.cors import CORSMiddleware
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Загружаем .env в os.environ (нужно для провайдеров, которые читают os.getenv)
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 from app.admin import setup_admin
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

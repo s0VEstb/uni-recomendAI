@@ -8,6 +8,8 @@ import Results from './pages/Results'
 import Profile from './pages/Profile'
 import Chat from './pages/Chat'
 import ProgramDetail from './pages/ProgramDetail'
+import Landing from './pages/Landing'
+import ResetPassword from './pages/ResetPassword'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -29,7 +31,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/survey" replace />} />
+        <Route index element={<Landing />} />
         <Route
           path="login"
           element={
@@ -43,6 +45,14 @@ export default function App() {
           element={
             <GuestOnlyRoute>
               <Register />
+            </GuestOnlyRoute>
+          }
+        />
+        <Route
+          path="reset-password"
+          element={
+            <GuestOnlyRoute>
+              <ResetPassword />
             </GuestOnlyRoute>
           }
         />

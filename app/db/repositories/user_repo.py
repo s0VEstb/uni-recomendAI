@@ -19,3 +19,12 @@ class UserRepo:
 
     async def get_by_id(self, user_id: int) -> User | None:
         return await self.db.get(User, user_id)
+
+    async def update(self, user: User) -> User:
+        """
+        Обновление пользователя (сохраняет изменения, сделанные с объектом).
+        """
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user

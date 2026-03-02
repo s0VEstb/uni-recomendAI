@@ -8,6 +8,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -15,6 +16,7 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setInfo('')
     setLoading(true)
     try {
       const { access_token } = await authApi.login(email, password)
@@ -30,8 +32,10 @@ export default function Login() {
   return (
     <div className={styles.wrap}>
       <h1 className={styles.title}>Вход</h1>
+      <p className={styles.subtitle}>Продолжите работу с опросом и рекомендациями.</p>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}
+        {info && !error && <p className={styles.success}>{info}</p>}
         <label>
           Email
           <input
@@ -58,9 +62,31 @@ export default function Login() {
           {loading ? 'Вход…' : 'Войти'}
         </button>
       </form>
-      <p className={styles.footer}>
-        Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
-      </p>
+      <div className={styles.footer}>
+        <p>
+          Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+        </p>
+        <button
+          type="button"
+          className={styles.buttonSecondary}
+          onClick={async () => {
+            if (!email) {
+              setError('Укажите email, чтобы получить ссылку для сброса пароля')
+              return
+            }
+            setError('')
+            setInfo('')
+            try {
+              await authApi.forgotPassword(email)
+              setInfo('Если такой аккаунт существует, мы отправили письмо со ссылкой для сброса пароля.')
+            } catch (err) {
+              setError(err instanceof Error ? err.message : 'Не удалось отправить письмо')
+            }
+          }}
+        >
+          Забыли пароль?
+        </button>
+      </div>
     </div>
   )
 }

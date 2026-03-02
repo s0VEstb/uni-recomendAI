@@ -19,6 +19,14 @@ export async function api<T>(
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers })
   if (!res.ok) {
+    // Если токен протух или пользователь удалён — очищаем локальное состояние и отправляем на логин
+    if (res.status === 401) {
+      localStorage.removeItem('token')
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+
     const err = await res.json().catch(() => ({ detail: res.statusText }))
     throw new Error(Array.isArray(err.detail) ? err.detail[0]?.msg ?? res.statusText : err.detail ?? res.statusText)
   }
@@ -35,6 +43,16 @@ export const auth = {
     api<{ access_token: string; token_type: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
+    }),
+  forgotPassword: (email: string) =>
+    api<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+  resetPassword: (token: string, newPassword: string) =>
+    api<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, new_password: newPassword }),
     }),
 }
 

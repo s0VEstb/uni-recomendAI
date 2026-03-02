@@ -1,11 +1,19 @@
+from pathlib import Path
+from typing import Optional
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file="../../.env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parents[2] / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     APP_NAME: str = "uni-reco"
     DEBUG: bool = True
+    JWT_SECRET: str = "CHANGE_ME"
 
     DB_HOST: str = "localhost"
     DB_PORT: int = 5433
@@ -14,6 +22,11 @@ class Settings(BaseSettings):
     DB_PASS: str = "app"
 
     db_driver: str = "postgresql+asyncpg"
+
+    # Email / SMTP (например, Gmail)
+    MAIL_USERNAME: Optional[str] = None
+    APP_PASSWORD: Optional[str] = None
+    MAIL_FROM: Optional[str] = None
 
     @property
     def DATABASE_URL(self) -> str:
