@@ -1,24 +1,123 @@
+/* ═══════════════════════════════
+   Profile — glassmorphism card
+   ═══════════════════════════════ */
+
 .wrap {
   width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0 3rem;
+}
+
+/* ── Header ── */
+.hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem 1.5rem;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #58a6ff, #a371f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 20px rgba(88, 166, 255, 0.3);
 }
 
 .title {
-  margin: 0 0 1.5rem;
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.actions {
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── Card ── */
+.card {
+  background: rgba(26, 35, 50, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(88, 166, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.link {
-  color: var(--accent);
-  font-size: 1rem;
+.cardTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.25rem;
 }
 
-.link:hover {
-  text-decoration: underline;
+/* ── Quick links ── */
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(15, 20, 25, 0.35);
+  border: 1px solid rgba(88, 166, 255, 0.07);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.navCard:hover {
+  border-color: rgba(88, 166, 255, 0.3);
+  background: rgba(88, 166, 255, 0.06);
+  transform: translateX(3px);
+  text-decoration: none;
+}
+
+.navIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+}
+
+.navArrow {
+  font-size: 0.9rem;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Light theme */
+:global([data-theme="light"]) .card {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+:global([data-theme="light"]) .navCard {
+  background: rgba(246, 248, 250, 0.6);
 }

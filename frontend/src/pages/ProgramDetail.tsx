@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getProgramDetail, type ProgramDetail as ProgramDetailType } from '../api/client'
 import styles from './ProgramDetail.module.css'
 
@@ -37,11 +37,7 @@ export default function ProgramDetail() {
   }, [universityId, programId])
 
   if (loading) {
-    return (
-      <div className={styles.wrap}>
-        <p className={styles.loading}>Загрузка…</p>
-      </div>
-    )
+    return <div className={styles.wrap}><p className={styles.loading}>Загрузка…</p></div>
   }
 
   if (error || !data) {
@@ -63,6 +59,7 @@ export default function ProgramDetail() {
         ← Назад к результатам
       </button>
 
+      {/* Header card */}
       <div className={styles.header}>
         <div className={styles.uniPhotoWrap}>
           <img
@@ -85,9 +82,10 @@ export default function ProgramDetail() {
         </div>
       </div>
 
+      {/* Fees */}
       {fees.length > 0 && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Стоимость</h2>
+          <h2 className={styles.sectionTitle}>💰 Стоимость</h2>
           <ul className={styles.feeList}>
             {fees.map((f) => (
               <li key={f.id} className={styles.feeCard}>
@@ -100,9 +98,10 @@ export default function ProgramDetail() {
         </section>
       )}
 
+      {/* Admissions */}
       {admissions.length > 0 && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Поступление</h2>
+          <h2 className={styles.sectionTitle}>📋 Поступление</h2>
           <ul className={styles.admList}>
             {admissions.map((a) => (
               <li key={a.id} className={styles.admCard}>
@@ -128,9 +127,10 @@ export default function ProgramDetail() {
         </section>
       )}
 
+      {/* Tags */}
       {tags.length > 0 && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Направления / теги</h2>
+          <h2 className={styles.sectionTitle}>🏷️ Направления / теги</h2>
           <div className={styles.tags}>
             {tags.map((t) => (
               <span key={t.id} className={styles.tag}>{t.title}</span>
@@ -140,8 +140,12 @@ export default function ProgramDetail() {
       )}
 
       <div className={styles.actions}>
-        <button type="button" className={styles.backButton} onClick={() => navigate('/chat', { state: { universityId: university.id, universityName: university.name } })}>
-          Чат с ИИ по вузу
+        <button
+          type="button"
+          className={styles.chatBtn}
+          onClick={() => navigate('/chat', { state: { universityId: university.id, universityName: university.name } })}
+        >
+          💬 Чат с ИИ по вузу
         </button>
       </div>
     </div>

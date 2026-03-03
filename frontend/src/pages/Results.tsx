@@ -9,6 +9,7 @@ export default function Results() {
   const state = location.state as SurveySubmitResult | null
   const [data, setData] = useState<SurveySubmitResult | null>(state)
   const [loading, setLoading] = useState(!state)
+  const [selectedPrograms, setSelectedPrograms] = useState<number[]>([])
 
   useEffect(() => {
     if (state) {
@@ -28,6 +29,27 @@ export default function Results() {
     }
     load()
   }, [state])
+
+  const toggleProgram = (programId: number) => {
+    setSelectedPrograms(prev =>
+      prev.includes(programId)
+        ? prev.filter(id => id !== programId)
+        : prev.length < 5 ? [...prev, programId] : prev
+    )
+  }
+
+  const reasonIcon = (code: string): string => {
+    const icons: Record<string, string> = {
+      budget_ok: '💰',
+      budget_too_low: '⚠️',
+      fee_unknown: '❓',
+      tag_match: '🎯',
+      ort_ok: '✅',
+      ort_unknown_or_not_required: '📋',
+      city_match: '📍',
+    }
+    return icons[code] ?? '•'
+  }
 
   if (loading) {
     return <div className={styles.wrap}><p className={styles.loading}>Загрузка…</p></div>
@@ -49,6 +71,18 @@ export default function Results() {
       <h1 className={styles.title}>Рекомендованные вузы</h1>
       {message && <p className={styles.message}>{message}</p>}
 
+      {selectedPrograms.length >= 2 && (
+        <div className={styles.compareBar}>
+          <span>Выбрано программ: {selectedPrograms.length}</span>
+          <button
+            className={styles.compareBtn}
+            onClick={() => navigate('/compare', { state: { programIds: selectedPrograms } })}
+          >
+            Сравнить выбранные
+          </button>
+        </div>
+      )}
+
       <ul className={styles.list}>
         {universities_top.map((item) => (
           <li key={item.university.id} className={styles.card}>
@@ -67,14 +101,35 @@ export default function Results() {
                 </p>
                 <div className={styles.programs}>
                   {item.programs.map((pr) => (
-                    <Link
-                      key={pr.program.id}
-                      to={`/universities/${item.university.id}/programs/${pr.program.id}`}
-                      className={styles.programCard}
-                    >
-                      <span className={styles.programName}>{pr.program.name}</span>
-                      <span className={styles.programScore}>{Math.round(pr.score * 100)}%</span>
-                    </Link>
+                    <div key={pr.program.id} className={styles.programRow}>
+                      <div className={styles.programTop}>
+                        <input
+                          type="checkbox"
+                          id={`prog-${pr.program.id}`}
+                          checked={selectedPrograms.includes(pr.program.id)}
+                          onChange={() => toggleProgram(pr.program.id)}
+                          className={styles.programCheck}
+                          title="Добавить к сравнению"
+                        />
+                        <Link
+                          to={`/universities/${item.university.id}/programs/${pr.program.id}`}
+                          className={styles.programCard}
+                        >
+                          <span className={styles.programName}>{pr.program.name}</span>
+                          <span className={styles.programScore}>{Math.round(pr.score * 100)}%</span>
+                        </Link>
+                      </div>
+                      {pr.reasons && pr.reasons.length > 0 && (
+                        <ul className={styles.reasons}>
+                          {pr.reasons.map((r) => (
+                            <li key={r.code} className={styles.reason}>
+                              <span className={styles.reasonIcon}>{reasonIcon(r.code)}</span>
+                              <span className={styles.reasonMsg}>{r.message}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   ))}
                 </div>
                 <button

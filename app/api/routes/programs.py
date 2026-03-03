@@ -10,27 +10,8 @@ from app.schemas.program import ProgramDetailOut, UniversityBriefOut, ProgramFee
 router = APIRouter()
 
 
-@router.get("/universities/{university_id}/programs/{program_id}", response_model=ProgramDetailOut)
-async def get_program_detail(
-    university_id: int,
-    program_id: int,
-    db: AsyncSession = Depends(get_async_session),
-):
-    q = (
-        select(Program)
-        .where(Program.id == program_id, Program.university_id == university_id)
-        .options(
-            selectinload(Program.university),
-            selectinload(Program.fees),
-            selectinload(Program.admissions),
-            selectinload(Program.tag_links).selectinload(ProgramTag.tag),
-        )
-    )
-    res = await db.execute(q)
-    program = res.scalar_one_or_none()
-    if not program:
-        raise HTTPException(status_code=404, detail="Program not found")
-
+def _build_program_detail(program) -> ProgramDetailOut:
+    """Build ProgramDetailOut from a loaded Program ORM object."""
     uni = program.university
     fees = [
         ProgramFeeOut(
@@ -57,3 +38,45 @@ async def get_program_detail(
         admissions=admissions,
         tags=tags,
     )
+
+
+def _program_query(extra_where):
+    """Base query for a single program with all relations loaded."""
+    return (
+        select(Program)
+        .where(extra_where)
+        .options(
+            selectinload(Program.university),
+            selectinload(Program.fees),
+            selectinload(Program.admissions),
+            selectinload(Program.tag_links).selectinload(ProgramTag.tag),
+        )
+    )
+
+
+@router.get("/universities/{university_id}/programs/{program_id}", response_model=ProgramDetailOut)
+async def get_program_detail(
+    university_id: int,
+    program_id: int,
+    db: AsyncSession = Depends(get_async_session),
+):
+    res = await db.execute(
+        _program_query((Program.id == program_id) & (Program.university_id == university_id))
+    )
+    program = res.scalar_one_or_none()
+    if not program:
+        raise HTTPException(status_code=404, detail="Program not found")
+    return _build_program_detail(program)
+
+
+@router.get("/programs/{program_id}", response_model=ProgramDetailOut)
+async def get_program_by_id(
+    program_id: int,
+    db: AsyncSession = Depends(get_async_session),
+):
+    """Карточка программы по ID (без university_id — удобно для фронта)."""
+    res = await db.execute(_program_query(Program.id == program_id))
+    program = res.scalar_one_or_none()
+    if not program:
+        raise HTTPException(status_code=404, detail="Program not found")
+    return _build_program_detail(program)

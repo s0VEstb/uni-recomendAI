@@ -2,7 +2,7 @@ from app.schemas.recommendation import (
     ProgramRecommendationOut, RecommendationReason,
     ProgramOut, UniversityOut, UniversityTopOut
 )
-from app.db.repositories.recommendation_repo import RecommendationRepo
+from app.db.repositories.recommendation_repo import RecommendationRepo, CITY_TO_DB_NAMES
 from app.core.security import ADMISSION_YEAR
 
 # Максимальный балл программы (budget_ok + tag_match + ort_considered)
@@ -86,6 +86,17 @@ class RecommendationService:
                     meta={"ort_score": submission.ort_score, "ort_min_score": ort_min, "year": ADMISSION_YEAR},
                 ))
                 raw_score += 1.0  # по желанию: давать балл только когда ort_min известен
+
+            # city_match
+            if submission.city and submission.city != "other":
+                db_names = CITY_TO_DB_NAMES.get(submission.city, [])
+                if university.city in db_names:
+                    reasons.append(RecommendationReason(
+                        code="city_match",
+                        message="Университет находится в выбранном городе",
+                        meta={"city": submission.city, "university_city": university.city},
+                    ))
+                    raw_score += 0.5
 
             temp.append((program, university, reasons, raw_score))
 
