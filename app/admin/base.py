@@ -5,6 +5,7 @@ from app.admin.document import DocumentAdmin, DocumentChunkAdmin
 from app.admin.fee_and_admission import ProgramFeeAdmin, ProgramAdmissionAdmin
 from app.admin.tag import TagAdmin, ProgramTagAdmin
 from app.admin.user import UserAdmin, SurveySubmissionAdmin, SavedProgramAdmin
+from app.admin.chat import ChatSessionAdmin, ChatMessageAdmin
 
 
 def setup_admin(app):
@@ -21,3 +22,5 @@ def setup_admin(app):
     admin.add_view(SurveySubmissionAdmin)
     admin.add_view(SavedProgramAdmin)
     admin.add_view(ProgramTagAdmin)
+    admin.add_view(ChatSessionAdmin)
+    admin.add_view(ChatMessageAdmin)

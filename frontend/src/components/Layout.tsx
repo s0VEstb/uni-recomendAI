@@ -10,8 +10,8 @@ export default function Layout() {
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>Uni Recomend</Link>
-        <nav>
+        <Link to="/" className={styles.logo}>uni recomendAI</Link>
+        <nav className={styles.nav}>
           <button
             type="button"
             onClick={toggleTheme}
@@ -23,18 +23,18 @@ export default function Layout() {
           </button>
           {isAuthenticated ? (
             <>
-              <Link to="/profile">Профиль</Link>
-              <Link to="/survey">Опрос</Link>
-              <Link to="/results">Мои результаты</Link>
-              <Link to="/chat">Чат с ИИ</Link>
+              <Link to="/profile" className={styles.navLink}>Профиль</Link>
+              <Link to="/survey" className={styles.navLink}>Опрос</Link>
+              <Link to="/results" className={styles.navLink}>Результаты</Link>
+              <Link to="/chat" className={styles.navLink}>Чат</Link>
               <button type="button" onClick={logout} className={styles.logout}>
                 Выйти
               </button>
             </>
           ) : (
             <>
-              <Link to="/login">Вход</Link>
-              <Link to="/register">Регистрация</Link>
+              <Link to="/login" className={styles.navLink}>Вход</Link>
+              <Link to="/register" className={styles.navLink}>Регистрация</Link>
             </>
           )}
         </nav>

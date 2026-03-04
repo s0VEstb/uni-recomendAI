@@ -6,9 +6,7 @@ from app.db.models.university import University
 from app.db.models.fee_and_admission import ProgramFee, ProgramAdmission
 from app.db.models.tag import ProgramTag
 from app.db.enums import Language
-
-# Год приёма для фильтрации fee и admission
-ADMISSION_YEAR = 2026
+from app.core.security import ADMISSION_YEAR  # единственный источник
 
 # Маппинг city (enum value) -> названия городов в БД (университеты могут использовать разные варианты)
 CITY_TO_DB_NAMES: dict[str, list[str]] = {

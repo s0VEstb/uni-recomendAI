@@ -10,6 +10,7 @@ import Chat from './pages/Chat'
 import ProgramDetail from './pages/ProgramDetail'
 import Landing from './pages/Landing'
 import ResetPassword from './pages/ResetPassword'
+import Compare from './pages/Compare'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ProgramDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="compare"
+          element={
+            <ProtectedRoute>
+              <Compare />
             </ProtectedRoute>
           }
         />

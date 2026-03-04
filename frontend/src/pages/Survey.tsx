@@ -32,6 +32,8 @@ const CITIES: { value: City; label: string }[] = [
   { value: 'other', label: 'Другой город' },
 ]
 
+const STEPS = ['Основные данные', 'Интересы', 'Сильные стороны', 'Предметы']
+
 export default function Survey() {
   const navigate = useNavigate()
   const [interests, setInterests] = useState<Tag[]>([])
@@ -136,97 +138,120 @@ export default function Survey() {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Опрос для подбора вуза</h1>
+      <h1 className={styles.title}>
+        Опрос для <span className={styles.titleGrad}>подбора вуза</span>
+      </h1>
+
+      {/* Stepper */}
+      <div className={styles.stepper}>
+        {STEPS.map((s, i) => (
+          <div key={s} className={styles.step}>
+            <span className={styles.stepNum}>{i + 1}</span>
+            <span className={styles.stepLabel}>{s}</span>
+            {i < STEPS.length - 1 && <div className={styles.stepLine} />}
+          </div>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}
 
+        {/* Section 1: Basic Data */}
         <section className={styles.section}>
-          <h2>Балл ОРТ и условия</h2>
-          <label>
-            Балл ОРТ (0–245)
-            <input
-              type="number"
-              min={0}
-              max={245}
-              value={ortScore}
-              onChange={(e) => setOrtScore(e.target.value)}
-              required
-              className={styles.input}
-            />
-          </label>
-          <label>
-            Макс. бюджет (сом)
-            <input
-              type="number"
-              min={0}
-              value={budgetMax}
-              onChange={(e) => setBudgetMax(e.target.value)}
-              placeholder="Не указан"
-              className={styles.input}
-            />
-          </label>
-          <label>
-            Город
-            <select
-              value={city}
-              onChange={(e) => setCity((e.target.value as City) || '')}
-              className={styles.input}
-            >
-              <option value="">— выбрать —</option>
-              {CITIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Язык обучения
-            <select
-              value={language}
-              onChange={(e) => setLanguage((e.target.value as Language) || '')}
-              className={styles.input}
-            >
-              <option value="">— выбрать —</option>
-              {LANGUAGES.map((l) => (
-                <option key={l.value} value={l.value}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Примечания
-            <input
-              type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Например: Хочу IT"
-              className={styles.input}
-            />
-          </label>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={needsDorm}
-              onChange={(e) => setNeedsDorm(e.target.checked)}
-              className={styles.checkbox}
-            />
-            Нужна общага
-          </label>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={willingToRelocate}
-              onChange={(e) => setWillingToRelocate(e.target.checked)}
-              className={styles.checkbox}
-            />
-            Готов к переезду
-          </label>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionBadge}>1</span>
+            <h2>Основные данные</h2>
+          </div>
+          <div className={styles.fieldsGrid}>
+            <label>
+              Балл ОРТ (0–245)
+              <input
+                type="number"
+                min={0}
+                max={245}
+                value={ortScore}
+                onChange={(e) => setOrtScore(e.target.value)}
+                required
+                className={styles.input}
+                placeholder="например, 130"
+              />
+            </label>
+            <label>
+              Макс. бюджет (сом)
+              <input
+                type="number"
+                min={0}
+                value={budgetMax}
+                onChange={(e) => setBudgetMax(e.target.value)}
+                placeholder="Не указан"
+                className={styles.input}
+              />
+            </label>
+            <label>
+              Город
+              <select
+                value={city}
+                onChange={(e) => setCity((e.target.value as City) || '')}
+                className={styles.input}
+              >
+                <option value="">— выбрать —</option>
+                {CITIES.map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Язык обучения
+              <select
+                value={language}
+                onChange={(e) => setLanguage((e.target.value as Language) || '')}
+                className={styles.input}
+              >
+                <option value="">— выбрать —</option>
+                {LANGUAGES.map((l) => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
+                ))}
+              </select>
+            </label>
+            <label style={{ gridColumn: '1 / -1' }}>
+              Примечания
+              <input
+                type="text"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Например: Хочу IT, интересует медицина…"
+                className={styles.input}
+              />
+            </label>
+          </div>
+          <div className={styles.checkboxGroup}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={needsDorm}
+                onChange={(e) => setNeedsDorm(e.target.checked)}
+                className={styles.checkbox}
+              />
+              🏠 Нужна общага
+            </label>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={willingToRelocate}
+                onChange={(e) => setWillingToRelocate(e.target.checked)}
+                className={styles.checkbox}
+              />
+              🚀 Готов к переезду
+            </label>
+          </div>
         </section>
 
+        {/* Section 2: Interests */}
         <section className={styles.section}>
-          <h2>Интересы</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionBadge}>2</span>
+            <h2>Интересы</h2>
+          </div>
           <div className={styles.tags}>
             {interests.map((t) => (
               <button
@@ -241,8 +266,12 @@ export default function Survey() {
           </div>
         </section>
 
+        {/* Section 3: Strengths */}
         <section className={styles.section}>
-          <h2>Сильные стороны</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionBadge}>3</span>
+            <h2>Сильные стороны</h2>
+          </div>
           <div className={styles.tags}>
             {strengths.map((t) => (
               <button
@@ -257,8 +286,12 @@ export default function Survey() {
           </div>
         </section>
 
+        {/* Section 4: Subjects */}
         <section className={styles.section}>
-          <h2>Предметы</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionBadge}>4</span>
+            <h2>Предметы</h2>
+          </div>
           <div className={styles.tags}>
             {subjects.map((t) => (
               <button
@@ -273,9 +306,11 @@ export default function Survey() {
           </div>
         </section>
 
-        <button type="submit" disabled={loadingSubmit} className={styles.submit}>
-          {loadingSubmit ? 'Отправка…' : 'Получить рекомендации'}
-        </button>
+        <div className={styles.submitRow}>
+          <button type="submit" disabled={loadingSubmit} className={styles.submit}>
+            {loadingSubmit ? 'Отправка…' : 'Получить рекомендации →'}
+          </button>
+        </div>
       </form>
     </div>
   )

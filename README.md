@@ -1,160 +1,115 @@
-# FastAPI Microservice Template 🚀
+# uni-recomendAI
 
-Базовый шаблон для создания микросервисов в экосистеме RideTrip.
-Включает в себя настроенный Docker, асинхронную работу с БД (SQLAlchemy + AsyncPG), миграции (Alembic) и структурированное логирование (Structlog).
+Сервис рекомендаций университетов и программ для учеников 9–11 классов Кыргызстана.
+Система анализирует анкету абитуриента (ОРТ, бюджет, город, интересы) и выдаёт персонализированные рекомендации с объяснениями причин.
 
-## 📋 Чек-лист при создании нового сервиса
+## Требования
 
-Как только вы создали репозиторий из этого шаблона, выполните следующие шаги:
+- **Python** 3.11+
+- **Node.js** 18+
+- **Docker** и Docker Compose
 
-1.  **Переименование:**
-    * В `app/core/config.py` измените `APP_NAME` на имя вашего сервиса.
-    * В `pyproject.toml` (или `requirements.txt`) обновите название проекта.
-2.  **Очистка:**
-    * Удалите папку `.git` и инициализируйте новую (если не использовали кнопку "Use this template").
-3.  **Зависимости:**
-    * Добавьте специфичные для сервиса библиотеки (например, `fastapi-users` для Auth или `stripe` для платежей).
-
----
-
-## 🏗 Структура проекта (Куда писать код?)
-
-Мы используем слоистую архитектуру. Код разносится по папкам в зависимости от ответственности:
-
-| Папка | Зачем нужна? | Пример |
-| :--- | :--- | :--- |
-| **`app/routes`** | **Точки входа (API).** Только обработка HTTP, валидация входных данных и вызов сервисов. Минимум логики. | `POST /users`, `GET /tours/{id}` |
-| **`app/schemas`** | **Pydantic модели.** Валидация данных "на вход" и "на выход". | `UserCreate`, `TourResponse` |
-| **`app/services`** | **Бизнес-логика.** Основной "мозг" сервиса. Здесь принимаются решения, происходят вычисления. | `calculate_price()`, `register_user()` |
-| **`app/crud`** | **Работа с БД.** Только прямые запросы к базе (Create, Read, Update, Delete). Никакой бизнес-логики. | `get_user_by_email()`, `create_order()` |
-| **`app/db`** | **Модели данных.** SQLAlchemy модели (таблицы БД). | `class User(Base): ...` |
-| **`app/middleware`** | **Middleware.** Перехват запросов (логирование, заголовки, CORS). | `ProcessTimeMiddleware` |
-| **`app/utils`** | **Утилиты.** Вспомогательные функции. | Логгер, форматтеры дат и т.д. |
-
----
-
-## 🚀 Как запустить
-
-### Через Docker (Рекомендуется)
-Сервис полностью готов к запуску в контейнере. Переменные окружения должны передаваться извне (docker-compose или k8s).
-
-
-
-# 1) Чек-лист “новый проект на FastAPI (шаблон) + Postgres + Alembic”
-
-## A. Клон и окружение
+## Quick Start
 
 ```bash
-git clone <REPO_URL>
-cd <project>
+# 1. Клонировать и настроить окружение
+git clone <repo-url>
+cd uni-recomendAI
+cp .env.example .env          # Заполните реальные значения
 
-# создать .env (важно: Makefile может include .env)
-printf '%s\n' \
-'DB_HOST=localhost' \
-'DB_PORT=5433' \
-'DB_NAME=uni' \
-'DB_USER=app' \
-'DB_PASS=app' \
-'DEBUG=true' \
-'APP_NAME=uni-reco' \
-> .env
+# 2. Поднять PostgreSQL с pgvector
+docker compose up -d
+# Подождать ~5 сек до готовности БД
 
-# venv и зависимости (если в Makefile venv)
-make venv
-```
+# 3. Установить Python зависимости
+pip install -r requirements.txt
 
-> Почему DB_PORT=5433? Потому что на маке часто уже занят 5432 локальным Postgres.
-
----
-
-## B. Поднять Postgres в Docker (без docker-compose)
-
-```bash
-docker run --name uni-pg \
-  -e POSTGRES_USER=app \
-  -e POSTGRES_PASSWORD=app \
-  -e POSTGRES_DB=uni \
-  -p 5433:5432 \
-  -d postgres:16
-```
-
-Проверка:
-
-```bash
-docker ps
-```
-
----
-
-## C. Активировать окружение (чтобы не вызывать системный python)
-
-```bash
-source venv/bin/activate
-```
-
----
-
-## D. Проверить коннект к БД (убивает 90% проблем)
-
-```bash
-python -c "import asyncio, asyncpg
-async def main():
-  conn = await asyncpg.connect('postgresql://app:app@localhost:5433/uni')
-  row = await conn.fetchrow('select current_user, current_database()')
-  print(dict(row))
-  await conn.close()
-asyncio.run(main())"
-```
-
----
-
-## E. Alembic миграции (первый раз)
-
-Если в шаблоне **нет** готовых миграций — создаём “init”:
-
-```bash
-alembic revision -m "init"
+# 4. Применить миграции (создаёт все таблицы + pgvector extension)
 alembic upgrade head
-alembic current
-```
 
----
+# 5. Заполнить базу данными
+python -m app.db.seed_tags          # 40+ тегов (интересы, сильные стороны, предметы)
+python -m app.db.seed_full_catalog  # Университеты, программы, fees, admissions, documents
 
-## F. Запуск сервиса
+# 6. Запустить backend
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-```bash
-make run-dev
+# 7. Запустить frontend (отдельный терминал)
+cd frontend && npm install && npm run dev
 ```
 
 Открыть:
+- **Frontend**: http://localhost:8080
+- **Swagger UI**: http://localhost:8000/docs
+- **Админка**: http://localhost:8000/admin
 
-* `http://127.0.0.1:8000/docs`
+## Makefile (удобные команды)
 
----
-
-## G. Типовые фиксы, которые мы делали
-
-### 1) `.env: missing separator`
-
-Причина: make читает `.env` как makefile, там должны быть только строки вида `KEY=VALUE`, без мусора.
-Фикс: пересоздать `.env` через `printf` (как выше).
-
-### 2) `make migrate: alembic: No such file or directory`
-
-Причина: Makefile зовёт системный `alembic`, а он в venv.
-Фикс: либо запускать `alembic ...` в активированном venv, либо починить Makefile:
-
-Добавить:
-
-```make
-ALEMBIC = $(VENV)/bin/alembic
+```bash
+make migrate          # alembic upgrade head
+make seed-tags        # python -m app.db.seed_tags
+make seed-catalog     # python -m app.db.seed_full_catalog
+make seed             # seed-tags + seed-catalog
+make frontend-dev     # npm install && npm run dev
+make run-dev          # uvicorn (linux/mac)
 ```
 
-И заменить `alembic ...` на `$(ALEMBIC) ...`.
+## API
 
-### 3) `role "app" does not exist`
+| Метод | Путь | Auth | Описание |
+|-------|------|------|---------|
+| GET | `/api/health` | — | Статус сервиса |
+| POST | `/api/auth/register` | — | Регистрация |
+| POST | `/api/auth/login` | — | Логин → JWT токен |
+| POST | `/api/auth/forgot-password` | — | Запрос сброса пароля |
+| POST | `/api/auth/reset-password` | — | Сброс пароля |
+| GET | `/api/tags` | — | Список тегов (фильтр по `?tag_type=`) |
+| POST | `/api/survey/submit` | JWT | Отправить анкету → рекомендации |
+| GET | `/api/survey/latest` | JWT | Последняя анкета + рекомендации |
+| GET | `/api/universities/{uid}/programs/{pid}` | — | Программа по UID и PID |
+| GET | `/api/programs/{id}` | — | Программа по ID (удобнее для фронта) |
+| POST | `/api/compare` | — | Сравнить 2–5 программ |
+| POST | `/api/chat/` | — | RAG-чат (SSE stream) |
 
-Причина: подключались не к тому Postgres (у тебя локальный висел на 5432).
-Фикс: сменить порт контейнера на 5433 и в `.env` тоже.
+## Архитектура
 
----
+```
+┌────────────────────────────────────────────────────────┐
+│  React (Vite, port 8080)                               │
+│  Landing → Register → Survey → Results → Compare       │
+│                         ↕ /api (Vite proxy)            │
+├────────────────────────────────────────────────────────┤
+│  FastAPI (uvicorn, port 8000)                          │
+│  Routes: auth | tags | survey | programs | compare | chat │
+│  Services: SurveyService → RecommendationService       │
+│  Admin: SQLAdmin (/admin)                              │
+├────────────────────────────────────────────────────────┤
+│  PostgreSQL 16 + pgvector (Docker, port 5433)         │
+│  10 таблиц: University, Program, Tag, ProgramTag,      │
+│  ProgramFee, ProgramAdmission, User, SurveySubmission, │
+│  SavedProgram, Document, DocumentChunk (Vector 384)    │
+└────────────────────────────────────────────────────────┘
+```
+
+### Scoring (причины рекомендаций)
+
+| Код | Описание |
+|-----|---------|
+| `budget_ok` | Программа вписывается в бюджет |
+| `budget_too_low` | Бюджет ниже стоимости контракта |
+| `fee_unknown` | Стоимость не указана |
+| `tag_match` | Совпадение с выбранными интересами |
+| `ort_ok` | Проходит по ОРТ |
+| `ort_unknown_or_not_required` | Порог ОРТ не указан |
+| `city_match` | Университет в выбранном городе |
+
+## Переменные окружения
+
+Скопируй `.env.example` → `.env` и заполни:
+
+| Переменная | Описание |
+|-----------|---------|
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` | PostgreSQL (порт 5433 в Docker) |
+| `GEMINI_API_KEY` | Google Gemini API (для RAG-чата) |
+| `JWT_SECRET` | Секрет для подписи JWT токенов |
+| `MAIL_USERNAME`, `APP_PASSWORD`, `MAIL_FROM` | Email (опционально, для сброса пароля) |

@@ -1,75 +1,151 @@
+/* ═══════════════════════════════
+   Layout — glassmorphism header
+   ═══════════════════════════════ */
+
 .layout {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 60px;
+  background: rgba(15, 20, 25, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(88, 166, 255, 0.08);
+  transition: background 0.3s;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.logo:hover {
+  text-decoration: none;
+  background: linear-gradient(135deg, #58a6ff, #a371f7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.navLink {
+  position: relative;
+  padding: 0.4rem 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, #58a6ff, #a371f7);
+  border-radius: 1px;
+  transition: transform 0.2s;
+}
+
+.navLink:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.navLink:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.themeToggle {
+  background: transparent;
+  border: 1px solid rgba(88, 166, 255, 0.15);
+  padding: 0.3rem 0.55rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.themeToggle:hover {
+  border-color: rgba(88, 166, 255, 0.4);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.logout {
+  background: transparent;
+  border: 1px solid rgba(88, 166, 255, 0.15);
+  color: var(--muted);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.logout:hover {
+  color: var(--text);
+  border-color: rgba(88, 166, 255, 0.4);
+  background: rgba(88, 166, 255, 0.06);
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Light theme */
+:global([data-theme="light"]) .header {
+  background: rgba(246, 248, 250, 0.85);
+  border-bottom-color: rgba(9, 105, 218, 0.08);
+}
+
+:global([data-theme="light"]) .logo:hover {
+  background: linear-gradient(135deg, #0969da, #8250df);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
   .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
   }
-  
-  .logo {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--text);
+
+  .navLink {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.82rem;
   }
-  
-  .logo:hover {
-    text-decoration: none;
-    color: var(--accent);
-  }
-  
-  .header nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .themeToggle {
-    background: transparent;
-    border: 1px solid var(--border);
-    padding: 0.35rem 0.6rem;
-    border-radius: var(--radius);
-    font-size: 1.1rem;
-    line-height: 1;
-  }
-  
-  .themeToggle:hover {
-    border-color: var(--accent);
-    background: rgba(88, 166, 255, 0.1);
-  }
-  
-  .header nav a {
-    color: var(--muted);
-  }
-  
-  .header nav a:hover {
-    color: var(--accent);
-  }
-  
+
   .logout {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 0.4rem 0.75rem;
-    border-radius: var(--radius);
-    font-size: 0.9rem;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
   }
-  
-  .logout:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-  
-  .main {
-    flex: 1;
-    padding: 2rem 1.5rem;
-    max-width: 960px;
-    margin: 0 auto;
-    width: 100%;
-  }
+}

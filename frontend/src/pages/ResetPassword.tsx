@@ -24,10 +24,8 @@ export default function ResetPassword() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!token) return
-
     setError('')
     setSuccess('')
-
     if (!password || password.length < 6) {
       setError('Пароль должен быть не короче 6 символов.')
       return
@@ -36,7 +34,6 @@ export default function ResetPassword() {
       setError('Пароли не совпадают.')
       return
     }
-
     setLoading(true)
     try {
       await authApi.resetPassword(token, password)
@@ -51,36 +48,40 @@ export default function ResetPassword() {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Новый пароль</h1>
-      <p className={styles.subtitle}>Придумайте надёжный пароль для входа в Uni Recomend.</p>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <p className={styles.error}>{error}</p>}
-        {success && !error && <p className={styles.success}>{success}</p>}
-        <label>
-          Новый пароль
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className={styles.input}
-          />
-        </label>
-        <label>
-          Повторите пароль
-          <input
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-            className={styles.input}
-          />
-        </label>
-        <button type="submit" disabled={loading || !token} className={styles.button}>
-          {loading ? 'Сохраняем…' : 'Сохранить новый пароль'}
-        </button>
-      </form>
+      <div className={styles.card}>
+        <div className={styles.iconWrap}>🔒</div>
+        <h1 className={styles.title}>Новый пароль</h1>
+        <p className={styles.subtitle}>Придумайте надёжный пароль для входа в Uni Recomend.</p>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {error && <p className={styles.error}>{error}</p>}
+          {success && !error && <p className={styles.success}>{success}</p>}
+          <label>
+            Новый пароль
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={styles.input}
+              placeholder="Минимум 6 символов"
+            />
+          </label>
+          <label>
+            Повторите пароль
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+              className={styles.input}
+              placeholder="Повторите пароль"
+            />
+          </label>
+          <button type="submit" disabled={loading || !token} className={styles.button}>
+            {loading ? 'Сохраняем…' : 'Сохранить новый пароль →'}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
-

@@ -155,6 +155,21 @@ export function getProgramDetail(universityId: number, programId: number): Promi
   return api<ProgramDetail>(`/universities/${universityId}/programs/${programId}`)
 }
 
+export function getProgramById(programId: number): Promise<ProgramDetail> {
+  return api<ProgramDetail>(`/programs/${programId}`)
+}
+
+export interface CompareResponse {
+  programs: ProgramDetail[]
+}
+
+export function comparePrograms(programIds: number[]): Promise<CompareResponse> {
+  return api<CompareResponse>('/compare/', {
+    method: 'POST',
+    body: JSON.stringify({ program_ids: programIds }),
+  })
+}
+
 export interface ChatStreamCallbacks {
   onMetadata?: (meta: { sources: unknown[]; found: boolean }) => void
   onChunk?: (text: string) => void
@@ -222,4 +237,58 @@ export async function chatStream(
   } catch (e) {
     callbacks?.onError?.(e instanceof Error ? e : new Error(String(e)))
   }
+}
+
+// ═══════════════════════════════════════════════
+// Chat History API (server-side, JWT-authenticated)
+// ═══════════════════════════════════════════════
+
+export interface ChatSessionData {
+  id: number
+  title: string
+  university_id: number | null
+  program_id: number | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ChatMessageData {
+  id: number
+  role: 'user' | 'assistant'
+  content: string
+  created_at: string
+}
+
+export interface ChatSessionDetail extends ChatSessionData {
+  messages: ChatMessageData[]
+}
+
+export const chatHistory = {
+  list: (): Promise<{ sessions: ChatSessionData[] }> =>
+    api<{ sessions: ChatSessionData[] }>('/chat/sessions'),
+
+  create: (data: { title?: string; university_id?: number | null; program_id?: number | null }): Promise<ChatSessionData> =>
+    api<ChatSessionData>('/chat/sessions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  get: (id: number): Promise<ChatSessionDetail> =>
+    api<ChatSessionDetail>(`/chat/sessions/${id}`),
+
+  delete: (id: number): Promise<{ ok: boolean }> =>
+    api<{ ok: boolean }>(`/chat/sessions/${id}`, { method: 'DELETE' }),
+
+  rename: (id: number, title: string): Promise<ChatSessionData> =>
+    api<ChatSessionData>(`/chat/sessions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ title }),
+    }),
+
+  addMessage: (sessionId: number, role: string, content: string): Promise<ChatMessageData> =>
+    api<ChatMessageData>(`/chat/sessions/${sessionId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ role, content }),
+    }),
 }

@@ -54,3 +54,18 @@ current:
 # Создать пустую миграцию (без autogenerate)
 makemigrations-empty:
 	alembic revision -m "$(m)"
+
+# Заполнить теги
+seed-tags:
+	python -m app.db.seed_tags
+
+# Заполнить каталог (университеты, программы, документы)
+seed-catalog:
+	python -m app.db.seed_full_catalog
+
+# Заполнить всё
+seed: seed-tags seed-catalog
+
+# Фронтенд дев
+frontend-dev:
+	cd frontend && npm install && npm run dev
