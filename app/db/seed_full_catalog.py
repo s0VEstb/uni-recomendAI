@@ -141,7 +141,8 @@ async def get_or_create_document(
         Document.doc_type == doc_type,
         Document.year == year,
     )
-    doc = (await db.execute(q)).scalar_one_or_none()
+    result = await db.execute(q)
+    doc = result.scalars().first()
     if doc:
         return doc
 
