@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -28,9 +29,17 @@ class Settings(BaseSettings):
     APP_PASSWORD: Optional[str] = None
     MAIL_FROM: Optional[str] = None
 
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, value):
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"release", "prod", "production"}:
+                return False
+        return value
+
     @property
     def DATABASE_URL(self) -> str:
         return f"{self.db_driver}://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 settings = Settings()
-

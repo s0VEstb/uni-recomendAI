@@ -1,10 +1,13 @@
 import asyncio
 import re
 import hashlib
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
 from sqlalchemy import select
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from app.db.database import AsyncSessionLocal
 from app.db.models.document import Document

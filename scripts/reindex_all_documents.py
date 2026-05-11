@@ -1,8 +1,11 @@
 import asyncio
+import sys
 from pathlib import Path
 from typing import Optional
 
 from sqlalchemy import select
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from app.db.database import AsyncSessionLocal
 from app.db.models.document import Document
