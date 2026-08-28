@@ -29,35 +29,40 @@ export default function Login() {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Вход</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <p className={styles.error}>{error}</p>}
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            className={styles.input}
-          />
-        </label>
-        <label>
-          Пароль
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className={styles.input}
-          />
-        </label>
-        <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? 'Вход…' : 'Войти'}
-        </button>
-      </form>
+      <h1 className={styles.title}>Добро пожаловать</h1>
+      <p className={styles.subtitle}>Войдите, чтобы найти свой университет</p>
+      <div className={styles.card}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {error && <p className={styles.error}>{error}</p>}
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              placeholder="your@email.com"
+              className={styles.input}
+            />
+          </label>
+          <label>
+            Пароль
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              placeholder="••••••••"
+              className={styles.input}
+            />
+          </label>
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? 'Вход…' : 'Войти'}
+          </button>
+        </form>
+      </div>
       <p className={styles.footer}>
         Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
       </p>

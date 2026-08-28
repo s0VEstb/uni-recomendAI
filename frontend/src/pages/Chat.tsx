@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { chatStream } from '../api/client'
 import styles from './Chat.module.css'
@@ -10,120 +10,129 @@ export default function Chat() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([])
   const [streamingText, setStreamingText] = useState('')
   const [loading, setLoading] = useState(false)
+  const [typing, setTyping] = useState(false)
   const [error, setError] = useState('')
   const [isListening, setIsListening] = useState(false)
+  const [interimText, setInterimText] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const streamedRef = useRef('')
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages, streamingText])
+  useEffect(() => { scrollToBottom() }, [messages, streamingText, typing])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const q = input.trim()
     if (!q || loading) return
     setInput('')
+    setInterimText('')
     setError('')
     setMessages((prev) => [...prev, { role: 'user', text: q }])
     setStreamingText('')
     setLoading(true)
-
+    setTyping(true)
     streamedRef.current = ''
-    await chatStream(
-      q,
-      { university_id: state?.universityId, top_k: 4 },
-      {
-        onChunk: (text) => {
-          streamedRef.current += text
-          setStreamingText(streamedRef.current)
-        },
-        onDone: () => {
-          const fullText = streamedRef.current
-          setMessages((prev) => [...prev, { role: 'assistant', text: fullText }])
-          setStreamingText('')
-          streamedRef.current = ''
-          setLoading(false)
-        },
-        onError: (err) => {
-          setError(err.message)
-          setLoading(false)
-        },
-      }
-    )
+
+    await chatStream(q, { university_id: state?.universityId, top_k: 4 }, {
+      onChunk: (text) => {
+        setTyping(false)
+        streamedRef.current += text
+        setStreamingText(streamedRef.current)
+      },
+      onDone: () => {
+        setMessages((prev) => [...prev, { role: 'assistant', text: streamedRef.current }])
+        setStreamingText('')
+        streamedRef.current = ''
+        setLoading(false)
+        setTyping(false)
+      },
+      onError: (err) => {
+        setError(err.message)
+        setLoading(false)
+        setTyping(false)
+      },
+    })
   }
 
   const startListening = () => {
     setError('')
-    const SpeechRecognitionAPI = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
-      || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition
-    if (!SpeechRecognitionAPI) {
-      setError('Распознавание речи не поддерживается в этом браузере')
+    const API =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
+
+    if (!API) {
+      setError('Голосовой ввод не поддерживается. Используйте Chrome или Edge.')
       return
     }
-    const recognition = new SpeechRecognitionAPI()
-    recognition.lang = 'ru-RU'
-    recognition.continuous = false
-    recognition.interimResults = false
-    recognition.onresult = (e: SpeechRecognitionEvent) => {
-      const result = e.results[e.results.length - 1]
-      if (!result?.length) return
-      const alternative = result[0]
-      const transcript = typeof alternative === 'object' && alternative !== null && 'transcript' in alternative
-        ? (alternative as { transcript: string }).transcript
-        : String(alternative)
-      if (transcript?.trim()) {
-        setInput((prev) => (prev ? `${prev} ${transcript.trim()}` : transcript.trim()))
+    if (recognitionRef.current) recognitionRef.current.abort()
+
+    const r = new API()
+    r.lang = 'ru-RU'
+    r.continuous = true
+    r.interimResults = true
+
+    r.onresult = (e: SpeechRecognitionEvent) => {
+      let interim = '', final = ''
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = (e.results[i][0] as any).transcript || ''
+        e.results[i].isFinal ? (final += t) : (interim += t)
       }
+      if (final.trim()) {
+        setInput((p) => p ? `${p} ${final.trim()}` : final.trim())
+        setInterimText('')
+      } else { setInterimText(interim) }
     }
-    recognition.onerror = (e: { error: string }) => {
-      if (e.error !== 'aborted') setError(`Ошибка: ${e.error}`)
-      setIsListening(false)
+
+    r.onerror = (e: any) => {
+      if (e.error === 'not-allowed') setError('Доступ к микрофону запрещён. Разрешите в настройках браузера.')
+      else if (e.error !== 'aborted' && e.error !== 'no-speech') setError(`Ошибка: ${e.error}`)
+      setIsListening(false); setInterimText('')
     }
-    recognition.onend = () => setIsListening(false)
-    recognition.start()
-    recognitionRef.current = recognition
+    r.onend = () => { setIsListening(false); setInterimText('') }
+    r.start()
+    recognitionRef.current = r
     setIsListening(true)
   }
 
   const stopListening = () => {
     recognitionRef.current?.stop()
     setIsListening(false)
+    setInterimText('')
   }
 
   return (
     <div className={styles.wrap}>
       <h1 className={styles.title}>
         Чат с ИИ-ассистентом
-        {state?.universityName && (
-          <span className={styles.context}> · {state.universityName}</span>
-        )}
+        {state?.universityName && <span className={styles.context}> · {state.universityName}</span>}
       </h1>
 
       <div className={styles.messages}>
-        {messages.length === 0 && !streamingText && (
-          <p className={styles.placeholder}>
-            Задайте вопрос о поступлении, программах или стоимости обучения.
-          </p>
+        {messages.length === 0 && !streamingText && !typing && (
+          <p className={styles.placeholder}>Задайте вопрос о поступлении, программах или стоимости обучения.</p>
         )}
         {messages.map((m, i) => (
-          <div key={i} className={m.role === 'user' ? styles.userMsg : styles.assistantMsg}>
-            {m.text}
-          </div>
+          <div key={i} className={m.role === 'user' ? styles.userMsg : styles.assistantMsg}>{m.text}</div>
         ))}
+
+        {typing && !streamingText && (
+          <div className={`${styles.assistantMsg} ${styles.typingMsg}`}>
+            <span className={styles.typingDots}><span /><span /><span /></span>
+          </div>
+        )}
+
         {streamingText && (
           <div className={styles.assistantMsg}>
-            {streamingText}
-            <span className={styles.cursor}>▋</span>
+            {streamingText}<span className={styles.cursor}>▋</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
+      {isListening && interimText && <p className={styles.interimText}>🎤 {interimText}</p>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputWrap}>
@@ -131,15 +140,15 @@ export default function Chat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Введите вопрос..."
-            className={styles.input}
+            placeholder={isListening ? 'Говорите...' : 'Введите вопрос...'}
+            className={`${styles.input} ${isListening ? styles.inputListening : ''}`}
             disabled={loading}
           />
           <button
             type="button"
             className={`${styles.micButton} ${isListening ? styles.micButtonActive : ''}`}
             onClick={isListening ? stopListening : startListening}
-            title={isListening ? 'Остановить' : 'Голосовой ввод'}
+            title={isListening ? 'Остановить запись' : 'Голосовой ввод (Chrome/Edge)'}
             aria-label={isListening ? 'Остановить запись' : 'Голосовой ввод'}
           >
             {isListening ? (
@@ -157,7 +166,7 @@ export default function Chat() {
           </button>
         </div>
         <button type="submit" disabled={loading || !input.trim()} className={styles.submit}>
-          {loading ? 'Отправка…' : 'Отправить'}
+          {loading ? 'Ответ…' : 'Отправить'}
         </button>
       </form>
     </div>

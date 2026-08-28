@@ -1,75 +1,132 @@
+/* ── Wrapper — центрируем карточку ──────────────── */
 .wrap {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
-  }
-  
-  .title {
-    margin: 0 0 1.5rem;
-    font-size: 1.75rem;
-    font-weight: 600;
-  }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-  
-  .form label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
-  
-  .input {
-    padding: 0.65rem 0.85rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-size: 1rem;
-  }
-  
-  .input:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  
-  .button {
-    padding: 0.75rem 1rem;
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius);
-    color: var(--bg);
-    font-weight: 600;
-    font-size: 1rem;
-    margin-top: 0.5rem;
-  }
-  
-  .button:hover:not(:disabled) {
-    background: var(--accent-hover);
-  }
-  
-  .button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .error {
-    margin: 0;
-    padding: 0.5rem 0.75rem;
-    background: rgba(248, 81, 73, 0.15);
-    border: 1px solid var(--error);
-    border-radius: var(--radius);
-    color: var(--error);
-    font-size: 0.9rem;
-  }
-  
-  .footer {
-    margin-top: 1.5rem;
-    color: var(--muted);
-    font-size: 0.95rem;
-  }
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto 0;
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ── Заголовок ──────────────────────────────────── */
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 0 0 1.75rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* ── Карточка ───────────────────────────────────── */
+.card {
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* ── Форма ──────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+/* ── Input ──────────────────────────────────────── */
+.input {
+  padding: 0.7rem 0.95rem;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+/* ── Submit button ─────────────────────────────── */
+.button {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1rem;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.3);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 16px rgba(88, 166, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Error ──────────────────────────────────────── */
+.error {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  background: var(--error-subtle);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.error::before {
+  content: '⚠';
+  font-size: 0.9rem;
+}
+
+/* ── Footer ─────────────────────────────────────── */
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer a {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.footer a:hover {
+  color: var(--accent-hover);
+}

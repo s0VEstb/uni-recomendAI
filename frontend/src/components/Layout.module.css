@@ -1,75 +1,117 @@
 .layout {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-  
-  .logo {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--text);
-  }
-  
-  .logo:hover {
-    text-decoration: none;
-    color: var(--accent);
-  }
-  
-  .header nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .themeToggle {
-    background: transparent;
-    border: 1px solid var(--border);
-    padding: 0.35rem 0.6rem;
-    border-radius: var(--radius);
-    font-size: 1.1rem;
-    line-height: 1;
-  }
-  
-  .themeToggle:hover {
-    border-color: var(--accent);
-    background: rgba(88, 166, 255, 0.1);
-  }
-  
-  .header nav a {
-    color: var(--muted);
-  }
-  
-  .header nav a:hover {
-    color: var(--accent);
-  }
-  
-  .logout {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 0.4rem 0.75rem;
-    border-radius: var(--radius);
-    font-size: 0.9rem;
-  }
-  
-  .logout:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-  
-  .main {
-    flex: 1;
-    padding: 2rem 1.5rem;
-    max-width: 960px;
-    margin: 0 auto;
-    width: 100%;
-  }
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Sticky header with glassmorphism ─────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  height: 60px;
+  background: rgba(22, 27, 34, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+[data-theme="light"] .header {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* ── Logo ─────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  text-decoration: none !important;
+  transition: opacity var(--transition);
+}
+
+.logo::before {
+  content: '🎓';
+  font-size: 1.2rem;
+}
+
+.logo:hover {
+  opacity: 0.85;
+  color: var(--text);
+}
+
+/* ── Nav ─────────────────────────────────────── */
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.header nav a {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+
+.header nav a:hover {
+  color: var(--text);
+  background: var(--accent-subtle);
+  text-decoration: none;
+}
+
+/* ── Theme toggle ────────────────────────────── */
+.themeToggle {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--muted);
+  margin-right: 0.5rem;
+}
+
+.themeToggle:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+/* ── Logout ──────────────────────────────────── */
+.logout {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--muted);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.logout:hover {
+  color: var(--error);
+  border-color: var(--error);
+  background: var(--error-subtle);
+}
+
+/* ── Main content ────────────────────────────── */
+.main {
+  flex: 1;
+  padding: 2.5rem 1.75rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.25s ease both;
+}

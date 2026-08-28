@@ -29,36 +29,41 @@ export default function Register() {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Регистрация</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <p className={styles.error}>{error}</p>}
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            className={styles.input}
-          />
-        </label>
-        <label>
-          Пароль
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            autoComplete="new-password"
-            className={styles.input}
-          />
-        </label>
-        <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? 'Регистрация…' : 'Зарегистрироваться'}
-        </button>
-      </form>
+      <h1 className={styles.title}>Создать аккаунт</h1>
+      <p className={styles.subtitle}>Подберём лучший вуз по вашим интересам</p>
+      <div className={styles.card}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {error && <p className={styles.error}>{error}</p>}
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              placeholder="your@email.com"
+              className={styles.input}
+            />
+          </label>
+          <label>
+            Пароль
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              autoComplete="new-password"
+              placeholder="Минимум 6 символов"
+              className={styles.input}
+            />
+          </label>
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? 'Регистрация…' : 'Зарегистрироваться'}
+          </button>
+        </form>
+      </div>
       <p className={styles.footer}>
         Уже есть аккаунт? <Link to="/login">Войти</Link>
       </p>

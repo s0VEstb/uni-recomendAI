@@ -1,123 +1,239 @@
+/* ── Page wrapper ─────────────────────────────── */
 .wrap {
-    width: 100%;
-  }
-  
-  .title {
-    margin: 0 0 1.5rem;
-    font-size: 1.75rem;
-    font-weight: 600;
-  }
-  
-  .loading {
-    color: var(--muted);
-  }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .section h2 {
-    margin: 0 0 0.25rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--muted);
-  }
-  
-  .section label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
+  width: 100%;
+  animation: fadeIn 0.3s ease both;
+}
 
-  .section .checkboxLabel {
-    flex-direction: row;
-    align-items: center;
-  }
+/* ── Page header ──────────────────────────────── */
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .section .checkbox {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: 0.5rem;
-  }
-  
-  .input {
-    padding: 0.65rem 0.85rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-size: 1rem;
-    max-width: 280px;
-  }
-  
-  .input:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .tag,
-  .tagActive {
-    padding: 0.4rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 0.9rem;
-  }
-  
-  .tag:hover,
-  .tagActive:hover {
-    border-color: var(--accent);
-  }
-  
-  .tagActive {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--bg);
-  }
-  
-  .error {
-    margin: 0;
-    padding: 0.5rem 0.75rem;
-    background: rgba(248, 81, 73, 0.15);
-    border: 1px solid var(--error);
-    border-radius: var(--radius);
-    color: var(--error);
-    font-size: 0.9rem;
-  }
-  
-  .submit {
-    padding: 0.85rem 1.25rem;
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius);
-    color: var(--bg);
-    font-weight: 600;
-    font-size: 1rem;
-    align-self: flex-start;
-  }
-  
-  .submit:hover:not(:disabled) {
-    background: var(--accent-hover);
-  }
-  
-  .submit:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
+.subtitle {
+  margin: 0 0 2rem;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* ── Loading ──────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  padding: 3rem 0;
+}
+
+.loading::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Form ─────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Section card ─────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.section:hover {
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.sectionIcon {
+  font-size: 1.1rem;
+}
+
+/* ── Labels & inputs ──────────────────────────── */
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .fieldsGrid { grid-template-columns: 1fr; }
+}
+
+.section label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.section .checkboxLabel {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.section .checkboxLabel:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.section .checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.input {
+  padding: 0.65rem 0.9rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+/* ── Tags ─────────────────────────────────────── */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag,
+.tagActive {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.tagActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.3);
+}
+
+.tagActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* ── Error ────────────────────────────────────── */
+.error {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  background: var(--error-subtle);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.error::before {
+  content: '⚠';
+}
+
+/* ── Submit button ────────────────────────────── */
+.submit {
+  padding: 0.9rem 1.75rem;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  align-self: flex-start;
+  box-shadow: 0 2px 10px rgba(88, 166, 255, 0.3);
+  letter-spacing: 0.01em;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 18px rgba(88, 166, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

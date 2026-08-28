@@ -131,17 +131,22 @@ export default function Survey() {
   }
 
   if (loadingTags || loadingLatest) {
-    return <p className={styles.loading}>Загрузка опроса…</p>
+    return <div className={styles.loading}>Загрузка опроса…</div>
   }
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Опрос для подбора вуза</h1>
+      <h1 className={styles.title}>Подбор университета</h1>
+      <p className={styles.subtitle}>Заполните анкету — мы найдём лучшие программы</p>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}
 
         <section className={styles.section}>
-          <h2>Балл ОРТ и условия</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>📊</span>
+            <h2>Балл ОРТ и условия</h2>
+          </div>
+          <div className={styles.fieldsGrid}>
           <label>
             Балл ОРТ (0–245)
             <input
@@ -205,6 +210,7 @@ export default function Survey() {
               className={styles.input}
             />
           </label>
+          </div>
           <label className={styles.checkboxLabel}>
             <input
               type="checkbox"
@@ -212,7 +218,7 @@ export default function Survey() {
               onChange={(e) => setNeedsDorm(e.target.checked)}
               className={styles.checkbox}
             />
-            Нужна общага
+            🏠 Нужна общага
           </label>
           <label className={styles.checkboxLabel}>
             <input
@@ -221,12 +227,15 @@ export default function Survey() {
               onChange={(e) => setWillingToRelocate(e.target.checked)}
               className={styles.checkbox}
             />
-            Готов к переезду
+            🚀 Готов к переезду
           </label>
         </section>
 
         <section className={styles.section}>
-          <h2>Интересы</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>💡</span>
+            <h2>Интересы</h2>
+          </div>
           <div className={styles.tags}>
             {interests.map((t) => (
               <button
@@ -242,7 +251,10 @@ export default function Survey() {
         </section>
 
         <section className={styles.section}>
-          <h2>Сильные стороны</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>💪</span>
+            <h2>Сильные стороны</h2>
+          </div>
           <div className={styles.tags}>
             {strengths.map((t) => (
               <button
@@ -258,7 +270,10 @@ export default function Survey() {
         </section>
 
         <section className={styles.section}>
-          <h2>Предметы</h2>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>📚</span>
+            <h2>Предметы</h2>
+          </div>
           <div className={styles.tags}>
             {subjects.map((t) => (
               <button

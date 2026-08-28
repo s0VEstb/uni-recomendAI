@@ -6,7 +6,7 @@ MAP = {"ru": "russian", "kg": "kyrgyz", "en": "english", "tr": "turkish"}
 
 class SurveySubmissionIn(BaseModel):
     ort_score: int = Field(ge=0, le=245)
-    budget_max: int | None = None
+    budget_max: int | None = Field(default=None, ge=0)
     city: City | None = None
     language: Language | None = None
 

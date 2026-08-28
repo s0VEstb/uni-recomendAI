@@ -1,88 +1,186 @@
+/* ── Wrapper ──────────────────────────────────── */
 .wrap {
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 60vh;
+  min-height: calc(100vh - 120px);
+  animation: fadeIn 0.3s ease both;
 }
 
+/* ── Title ───────────────────────────────────── */
 .title {
   margin: 0 0 1rem;
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.title::before {
+  content: '🤖';
+  font-size: 1.4rem;
 }
 
 .context {
   color: var(--muted);
   font-weight: 400;
+  font-size: 1rem;
 }
 
+/* ── Messages area ───────────────────────────── */
 .messages {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem 0;
-  min-height: 200px;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  min-height: 300px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  overflow-y: auto;
+  max-height: 55vh;
 }
 
+/* ── Placeholder ─────────────────────────────── */
 .placeholder {
   color: var(--muted);
   font-size: 0.95rem;
-  margin: 0;
+  margin: auto;
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.7;
 }
 
+.placeholder::before {
+  display: block;
+  content: '💬';
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── User message ────────────────────────────── */
 .userMsg {
   align-self: flex-end;
-  max-width: 85%;
+  max-width: 80%;
   padding: 0.75rem 1rem;
   background: var(--accent);
-  color: var(--bg);
-  border-radius: var(--radius);
+  color: #fff;
+  border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.25);
+  animation: slideIn 0.2s ease both;
 }
 
+/* ── Assistant message ──────────────────────── */
 .assistantMsg {
   align-self: flex-start;
-  max-width: 90%;
-  padding: 0.75rem 1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  max-width: 88%;
+  padding: 0.85rem 1.1rem;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg);
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-word;
+  animation: fadeIn 0.2s ease both;
+  position: relative;
 }
 
+.assistantMsg::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 12px;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+/* ── Typing indicator ───────────────────────── */
+.typingMsg {
+  min-width: 64px;
+  padding: 0.9rem 1.1rem;
+}
+
+.typingDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.typingDots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.8;
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.typingDots span:nth-child(2) { animation-delay: 0.2s; }
+.typingDots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── Interim voice text ──────────────────────── */
+.interimText {
+  margin: 0 0 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+  animation: fadeIn 0.2s ease both;
+}
+
+/* ── Input listening state ───────────────────── */
+.inputListening {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+}
+
+/* ── Cursor blink ────────────────────────────── */
 .cursor {
   display: inline-block;
-  animation: blink 1s step-end infinite;
+  animation: pulse 1s step-end infinite;
   color: var(--accent);
+  margin-left: 2px;
 }
 
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
+/* ── Error ───────────────────────────────────── */
 .error {
-  margin: 0 0 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(248, 81, 73, 0.15);
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--error-subtle);
   border: 1px solid var(--error);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   color: var(--error);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
+/* ── Input form ──────────────────────────────── */
 .form {
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
 .inputWrap {
@@ -94,78 +192,81 @@
 
 .input {
   flex: 1;
-  padding: 0.75rem 1rem;
-  background: var(--surface);
+  padding: 0.7rem 1rem;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
-  font-size: 1rem;
+  font-size: 0.95rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .input:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* ── Mic button ──────────────────────────────── */
 .micButton {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  cursor: pointer;
+  color: var(--muted);
   flex-shrink: 0;
 }
 
 .micButton:hover {
   border-color: var(--accent);
-  background: var(--accent);
-  color: var(--bg);
+  color: var(--accent);
+  background: var(--accent-subtle);
 }
 
 .micButtonActive {
   background: var(--error);
   border-color: var(--error);
-  color: white;
+  color: #fff;
+  animation: pulse 1.5s ease infinite;
 }
 
 .micButtonActive:hover {
+  opacity: 0.85;
   background: var(--error);
-  border-color: var(--error);
-  color: white;
-  opacity: 0.9;
 }
 
-.micIcon {
-  width: 22px;
-  height: 22px;
-}
+.micIcon { width: 20px; height: 20px; }
 
+/* ── Submit ──────────────────────────────────── */
 .submit {
-  padding: 0.75rem 1.25rem;
+  padding: 0.7rem 1.25rem;
   background: var(--accent);
   border: none;
   border-radius: var(--radius);
-  color: var(--bg);
+  color: #fff;
   font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.25);
 }
 
 .submit:hover:not(:disabled) {
   background: var(--accent-hover);
+  box-shadow: 0 4px 14px rgba(88, 166, 255, 0.4);
 }
 
 .submit:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none;
 }

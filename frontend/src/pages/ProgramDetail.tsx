@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getProgramDetail, type ProgramDetail as ProgramDetailType } from '../api/client'
 import styles from './ProgramDetail.module.css'
 
@@ -75,7 +75,10 @@ export default function ProgramDetail() {
           <h1 className={styles.programName}>{data.name}</h1>
           <p className={styles.uniName}>{university.name}</p>
           <p className={styles.meta}>
-            {university.city} · {LANGUAGE_LABELS[data.language] ?? data.language} · {STUDY_FORM_LABELS[data.study_form] ?? data.study_form} · {data.duration_years} лет
+            <span className={styles.metaBadge}>📍 {university.city}</span>
+            <span className={styles.metaBadge}>🌐 {LANGUAGE_LABELS[data.language] ?? data.language}</span>
+            <span className={styles.metaBadge}>📋 {STUDY_FORM_LABELS[data.study_form] ?? data.study_form}</span>
+            <span className={styles.metaBadge}>⏱ {data.duration_years} лет</span>
           </p>
           {data.official_url && (
             <a href={data.official_url} target="_blank" rel="noopener noreferrer" className={styles.officialLink}>

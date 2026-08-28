@@ -1,151 +1,262 @@
+/* ── Page wrapper ─────────────────────────────── */
 .wrap {
-    width: 100%;
-  }
-  
-  .title {
-    margin: 0 0 0.5rem;
-    font-size: 1.75rem;
-    font-weight: 600;
-  }
-  
-  .message {
-    margin: 0 0 1.5rem;
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-  
-  .empty {
-    color: var(--muted);
-    margin-bottom: 1rem;
-  }
+  width: 100%;
+  animation: fadeIn 0.3s ease both;
+}
 
-  .loading {
-    color: var(--muted);
-  }
-  
-  .link {
-    color: var(--accent);
-  }
-  
-  .list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-  
-  .card {
-    padding: 1.25rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-  }
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .cardContent {
-    display: flex;
-    gap: 1.25rem;
-    align-items: flex-start;
-  }
+.message {
+  margin: 0 0 2rem;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 0.85rem 1rem;
+  background: var(--success-subtle);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+  border-radius: var(--radius);
+}
 
-  .photoWrap {
-    flex-shrink: 0;
-  }
+.empty {
+  color: var(--muted);
+  margin-bottom: 1rem;
+  padding: 3rem 0;
+  text-align: center;
+}
 
-  .photo {
-    width: 200px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-  }
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  padding: 3rem 0;
+}
 
-  .uniInfo {
-    flex: 1;
-    min-width: 0;
-  }
+.loading::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
 
-  .chatButton {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    border-radius: var(--radius);
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
+.link { color: var(--accent); }
 
-  .chatButton:hover {
-    background: var(--accent-hover);
-  }
-  
-  .uniName {
-    margin: 0 0 0.35rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  
-  .meta {
-    margin: 0 0 0.75rem;
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
-  
-  .programs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  
-  .programCard {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    padding: 0.85rem 1rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    min-width: 160px;
-    text-decoration: none;
-    color: inherit;
-  }
+/* ── University list ──────────────────────────── */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
-  .programCard:hover {
-    border-color: var(--accent);
-    background: rgba(88, 166, 255, 0.08);
-  }
-  
-  .programName {
-    color: var(--text);
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
-  
-  .programScore {
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 1rem;
-  }
-  
-  .actions {
-    margin-top: 2rem;
-  }
-  
-  .button {
-    padding: 0.6rem 1rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-size: 0.95rem;
-  }
-  
-  .button:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-  
+/* ── University card ──────────────────────────── */
+.card {
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+/* Rank ribbon */
+.card[data-rank="1"] { border-left: 3px solid var(--gold); }
+.card[data-rank="2"] { border-left: 3px solid var(--silver); }
+.card[data-rank="3"] { border-left: 3px solid var(--bronze); }
+
+.cardContent {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+/* ── Photo ──────────────────────────────────────── */
+.photoWrap { flex-shrink: 0; }
+
+.photo {
+  width: 140px;
+  height: 105px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* ── University info ─────────────────────────── */
+.uniInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.uniHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.medal {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.uniName {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ── Score bar ───────────────────────────────── */
+.scoreWrap {
+  margin: 0.5rem 0 0.85rem;
+}
+
+.scoreLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.scoreValue {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.scoreBar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Programs ────────────────────────────────── */
+.programsMeta {
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-bottom: 0.65rem;
+}
+
+.programs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.programCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 180px;
+  max-width: 260px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.programCard:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  text-decoration: none;
+}
+
+.programName {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.programScore {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  background: var(--accent-subtle);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+/* ── Chat button ─────────────────────────────── */
+.chatButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.chatButton:hover {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.3);
+}
+
+/* ── Actions ─────────────────────────────────── */
+.actions {
+  margin-top: 2.5rem;
+}
+
+.button {
+  padding: 0.65rem 1.1rem;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
