@@ -32,11 +32,13 @@ class NullLLMProvider(BaseLLMProvider):
 class GeminiLLMProvider(BaseLLMProvider):
     def __init__(self) -> None:
         self.api_key = os.getenv("GEMINI_API_KEY")
-        # Правильные названия: gemini-2.5-flash-lite, gemini-2.0-flash, gemini-1.5-pro
-        self.model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+        # Можно писать просто 'gemini-3.5-flash-lite' — префикс 'models/' добавится автоматически
+        raw_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+        self.model = raw_model if raw_model.startswith("models/") else f"models/{raw_model}"
 
         if not self.api_key:
             raise RuntimeError("GEMINI_API_KEY is not set in .env")
+
 
 
         # Базовые настройки контекста (можешь подкрутить через env)
