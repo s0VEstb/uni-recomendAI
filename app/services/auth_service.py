@@ -46,10 +46,10 @@ class AuthService:
     async def reset_password(self, token: str, new_password: str) -> None:
         """
         Подтверждение сброса пароля по токену.
+        Использует decode_token с проверкой scope="password_reset",
+        чтобы access токены нельзя было использовать для сброса пароля.
         """
-        payload = decode_token(token)
-        if payload.get("scope") != "password_reset":
-            raise ValueError("Invalid token scope")
+        payload = decode_token(token, expected_scope="password_reset")
 
         user_id = int(payload["sub"])
         user = await self.user_repo.get_by_id(user_id)

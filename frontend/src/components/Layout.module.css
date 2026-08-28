@@ -25,6 +25,9 @@
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-weight: 800;
   font-size: 1.15rem;
   letter-spacing: 0.02em;
@@ -39,6 +42,11 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.logoIcon {
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 .nav {
@@ -78,6 +86,37 @@
 
 .navLink:hover::after {
   transform: translateX(-50%) scaleX(1);
+}
+
+/* Active nav link */
+.navLinkActive {
+  color: var(--text);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.navLinkActive::after {
+  transform: translateX(-50%) scaleX(1) !important;
+}
+
+/* Register CTA button */
+.registerBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #58a6ff, #a371f7);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 2px 12px rgba(88, 166, 255, 0.3);
+}
+
+.registerBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  text-decoration: none;
 }
 
 .themeToggle {

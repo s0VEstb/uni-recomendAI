@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════
+   Global design tokens & base styles
+   ═══════════════════════════════════════════════════════ */
+
 :root,
 [data-theme="dark"] {
   --bg: #0f1419;
@@ -9,8 +13,19 @@
   --accent-hover: #79b8ff;
   --success: #3fb950;
   --error: #f85149;
+  --warning: #f0a832;
   --radius: 12px;
   --font: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Inter', 'Consolas', monospace;
+
+  /* Score bar colors */
+  --score-high: #3fb950;
+  --score-mid: #f0a832;
+  --score-low: #f85149;
+
+  /* Transition defaults */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.22s ease;
 }
 
 [data-theme="light"] {
@@ -23,9 +38,16 @@
   --accent-hover: #0550ae;
   --success: #1a7f37;
   --error: #cf222e;
+  --warning: #9a6700;
+  --score-high: #1a7f37;
+  --score-mid: #9a6700;
+  --score-low: #cf222e;
 }
 
-* {
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -37,6 +59,7 @@ body {
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -59,4 +82,56 @@ button {
 
 input, select, textarea {
   font-family: inherit;
+}
+
+/* ── Skeleton Loading Animation ── */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    rgba(88, 166, 255, 0.06) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+/* ── Score bar utility ── */
+@keyframes score-fill {
+  from { width: 0; }
+}
+
+/* ── Fade-in animation ── */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.4s ease forwards;
 }

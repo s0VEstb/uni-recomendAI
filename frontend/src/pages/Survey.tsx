@@ -39,10 +39,12 @@ export default function Survey() {
   const [interests, setInterests] = useState<Tag[]>([])
   const [strengths, setStrengths] = useState<Tag[]>([])
   const [subjects, setSubjects] = useState<Tag[]>([])
+  const [careers, setCareers] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(true)
   const [loadingSubmit, setLoadingSubmit] = useState(false)
   const [loadingLatest, setLoadingLatest] = useState(true)
   const [error, setError] = useState('')
+  const [activeStep, setActiveStep] = useState(0)
 
   const [ortScore, setOrtScore] = useState('')
   const [budgetMax, setBudgetMax] = useState('')
@@ -56,14 +58,16 @@ export default function Survey() {
   useEffect(() => {
     async function load() {
       try {
-        const [i, s, sub] = await Promise.all([
+        const [i, s, sub, c] = await Promise.all([
           listTags('interest'),
           listTags('strength'),
           listTags('subject'),
+          listTags('career'),
         ])
         setInterests(i)
         setStrengths(s)
         setSubjects(sub)
+        setCareers(c)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Не удалось загрузить теги')
       } finally {
@@ -132,9 +136,20 @@ export default function Survey() {
     }
   }
 
+  const countSelected = (tags: Tag[]) => tags.filter(t => selectedTagIds.includes(t.id)).length
+
   if (loadingTags || loadingLatest) {
-    return <p className={styles.loading}>Загрузка опроса…</p>
+    return (
+      <div className={styles.wrap}>
+        <div className={styles.loadingWrap}>
+          <div className={styles.spinner} />
+          <p className={styles.loading}>Загружаем опрос…</p>
+        </div>
+      </div>
+    )
   }
+
+  const STEPS_LABELS = ['Основные данные', 'Интересы', 'Сильные стороны', 'Предметы', 'Карьера']
 
   return (
     <div className={styles.wrap}>
@@ -144,11 +159,11 @@ export default function Survey() {
 
       {/* Stepper */}
       <div className={styles.stepper}>
-        {STEPS.map((s, i) => (
+        {STEPS_LABELS.map((s, i) => (
           <div key={s} className={styles.step}>
-            <span className={styles.stepNum}>{i + 1}</span>
-            <span className={styles.stepLabel}>{s}</span>
-            {i < STEPS.length - 1 && <div className={styles.stepLine} />}
+            <span className={`${styles.stepNum} ${activeStep === i ? styles.stepNumActive : ''}`}>{i + 1}</span>
+            <span className={`${styles.stepLabel} ${activeStep === i ? styles.stepLabelActive : ''}`}>{s}</span>
+            {i < STEPS_LABELS.length - 1 && <div className={styles.stepLine} />}
           </div>
         ))}
       </div>
@@ -157,7 +172,7 @@ export default function Survey() {
         {error && <p className={styles.error}>{error}</p>}
 
         {/* Section 1: Basic Data */}
-        <section className={styles.section}>
+        <section className={styles.section} onMouseEnter={() => setActiveStep(0)}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionBadge}>1</span>
             <h2>Основные данные</h2>
@@ -247,10 +262,13 @@ export default function Survey() {
         </section>
 
         {/* Section 2: Interests */}
-        <section className={styles.section}>
+        <section className={styles.section} onMouseEnter={() => setActiveStep(1)}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>2</span>
+            <span className={styles.sectionBadge} style={{ background: 'linear-gradient(135deg, #58a6ff, #3b82f6)' }}>2</span>
             <h2>Интересы</h2>
+            {countSelected(interests) > 0 && (
+              <span className={styles.tagCount}>✓ {countSelected(interests)}</span>
+            )}
           </div>
           <div className={styles.tags}>
             {interests.map((t) => (
@@ -267,10 +285,13 @@ export default function Survey() {
         </section>
 
         {/* Section 3: Strengths */}
-        <section className={styles.section}>
+        <section className={styles.section} onMouseEnter={() => setActiveStep(2)}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>3</span>
+            <span className={styles.sectionBadge} style={{ background: 'linear-gradient(135deg, #a371f7, #8b5cf6)' }}>3</span>
             <h2>Сильные стороны</h2>
+            {countSelected(strengths) > 0 && (
+              <span className={styles.tagCount}>✓ {countSelected(strengths)}</span>
+            )}
           </div>
           <div className={styles.tags}>
             {strengths.map((t) => (
@@ -287,11 +308,15 @@ export default function Survey() {
         </section>
 
         {/* Section 4: Subjects */}
-        <section className={styles.section}>
+        <section className={styles.section} onMouseEnter={() => setActiveStep(3)}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>4</span>
+            <span className={styles.sectionBadge} style={{ background: 'linear-gradient(135deg, #f0a832, #f59e0b)' }}>4</span>
             <h2>Предметы</h2>
+            {countSelected(subjects) > 0 && (
+              <span className={styles.tagCount}>✓ {countSelected(subjects)}</span>
+            )}
           </div>
+          <p className={styles.sectionHint}>Какие предметы вам даются лучше всего?</p>
           <div className={styles.tags}>
             {subjects.map((t) => (
               <button
@@ -306,11 +331,45 @@ export default function Survey() {
           </div>
         </section>
 
+        {/* Section 5: Career */}
+        {careers.length > 0 && (
+          <section className={styles.section} onMouseEnter={() => setActiveStep(4)}>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionBadge} style={{ background: 'linear-gradient(135deg, #3fb950, #22c55e)' }}>5</span>
+              <h2>Карьера</h2>
+              {countSelected(careers) > 0 && (
+                <span className={styles.tagCount}>✓ {countSelected(careers)}</span>
+              )}
+            </div>
+            <p className={styles.sectionHint}>Кем вы хотите работать в будущем?</p>
+            <div className={styles.tags}>
+              {careers.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => toggleTag(t.id)}
+                  className={selectedTagIds.includes(t.id) ? styles.tagActive : styles.tag}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className={styles.submitRow}>
+          <div className={styles.selectedSummary}>
+            {selectedTagIds.length > 0 && (
+              <span className={styles.selectedCount}>
+                🎯 Выбрано интересов: <strong>{selectedTagIds.length}</strong>
+              </span>
+            )}
+          </div>
           <button type="submit" disabled={loadingSubmit} className={styles.submit}>
             {loadingSubmit ? 'Отправка…' : 'Получить рекомендации →'}
           </button>
         </div>
+
       </form>
     </div>
   )

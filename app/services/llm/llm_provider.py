@@ -2,7 +2,15 @@ from __future__ import annotations
 
 import os
 import re
+from pathlib import Path
 from typing import Optional, List, Dict, Any, AsyncGenerator
+
+# Гарантируем загрузку .env даже если uvicorn запущен не через main.py
+try:
+    from dotenv import load_dotenv as _load_dotenv
+    _load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=True)
+except ImportError:
+    pass  # python-dotenv не установлен — переменные должны быть в os.environ
 
 
 class BaseLLMProvider:
@@ -24,10 +32,12 @@ class NullLLMProvider(BaseLLMProvider):
 class GeminiLLMProvider(BaseLLMProvider):
     def __init__(self) -> None:
         self.api_key = os.getenv("GEMINI_API_KEY")
-        self.model = os.getenv("GEMINI_MODEL")
+        # Правильные названия: gemini-2.5-flash-lite, gemini-2.0-flash, gemini-1.5-pro
+        self.model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
 
         if not self.api_key:
-            raise RuntimeError("GEMINI_API_KEY is not set")
+            raise RuntimeError("GEMINI_API_KEY is not set in .env")
+
 
         # Базовые настройки контекста (можешь подкрутить через env)
         self.max_snippets_default = int(os.getenv("RAG_LLM_MAX_SNIPPETS", "4"))

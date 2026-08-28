@@ -504,3 +504,62 @@
 :global([data-theme="light"]) .assistantMsg {
   background: rgba(255, 255, 255, 0.75);
 }
+
+/* ── Typing Indicator ("ИИ печатает...") ── */
+
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.typingWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+  align-self: flex-start;
+}
+
+.typingBubble {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.65rem 1rem;
+  background: rgba(26, 35, 50, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(88, 166, 255, 0.12);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.typingDot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+.typingDot:nth-child(1) { animation-delay: 0s; }
+.typingDot:nth-child(2) { animation-delay: 0.2s; }
+.typingDot:nth-child(3) { animation-delay: 0.4s; }
+
+.typingLabel {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Light theme for typing bubble */
+:global([data-theme="light"]) .typingBubble {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(9, 105, 218, 0.12);
+}

@@ -1,7 +1,23 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 import { chatStream, chatHistory, type ChatSessionData, type ChatMessageData } from '../api/client'
+import ConfirmDialog from '../components/ConfirmDialog'
 import styles from './Chat.module.css'
+
+
+// ── Анимация "ИИ печатает" ────────────────────────────────────
+function TypingIndicator() {
+  return (
+    <div className={styles.typingWrap}>
+      <div className={styles.typingBubble}>
+        <span className={styles.typingDot} />
+        <span className={styles.typingDot} />
+        <span className={styles.typingDot} />
+      </div>
+      <span className={styles.typingLabel}>ИИ печатает…</span>
+    </div>
+  )
+}
 
 interface LocalMessage {
   role: 'user' | 'assistant'
@@ -30,6 +46,13 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const streamedRef = useRef('')
+
+  // ── Confirm dialog state ─────────────────────────────────────
+  type DialogType = 'delete-one' | 'delete-all' | null
+  const [dialog, setDialog] = useState<{ type: DialogType; sessionId?: number }>({
+    type: null,
+  })
+  const closeDialog = () => setDialog({ type: null })
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -183,7 +206,19 @@ export default function Chat() {
 
   const handleDeleteChat = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!confirm('Удалить этот чат?')) return
+    setDialog({ type: 'delete-one', sessionId: id })
+  }
+
+
+  const handleClearAll = async () => {
+    setDialog({ type: 'delete-all' })
+  }
+
+  // Реальное удаление после подтверждения
+  const confirmDeleteOne = async () => {
+    const id = dialog.sessionId
+    closeDialog()
+    if (!id) return
     try {
       await chatHistory.delete(id)
       const res = await chatHistory.list()
@@ -197,8 +232,8 @@ export default function Chat() {
     }
   }
 
-  const handleClearAll = async () => {
-    if (!confirm('Удалить всю историю чатов?')) return
+  const confirmDeleteAll = async () => {
+    closeDialog()
     try {
       await Promise.all(chatList.map((s) => chatHistory.delete(s.id)))
       setChatList([])
@@ -208,6 +243,7 @@ export default function Chat() {
       setError('Не удалось очистить историю')
     }
   }
+
 
   // ── Voice input ─────────────────────────────────────────────
   const startListening = () => {
@@ -286,8 +322,15 @@ export default function Chat() {
                 className={styles.deleteChatBtn}
                 onClick={(e) => handleDeleteChat(chat.id, e)}
                 title="Удалить чат"
+                aria-label="Удалить чат"
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
               </button>
             </li>
           ))}
@@ -335,6 +378,9 @@ export default function Chat() {
               {m.text}
             </div>
           ))}
+          {/* Анимация "ИИ думает" — пока ещё нет первого текста */}
+          {loading && !streamingText && <TypingIndicator />}
+          {/* Стриминг ответа */}
           {streamingText && (
             <div className={styles.assistantMsg}>
               {streamingText}
@@ -391,6 +437,30 @@ export default function Chat() {
           </div>
         </form>
       </div>
+
+      {/* ── Диалог удаления одного чата ── */}
+      <ConfirmDialog
+        isOpen={dialog.type === 'delete-one'}
+        title="Удалить чат?"
+        message="Это действие нельзя отменить. История переписки будет удалена навсегда."
+        confirmLabel="Удалить"
+        cancelLabel="Отмена"
+        danger
+        onConfirm={confirmDeleteOne}
+        onCancel={closeDialog}
+      />
+
+      {/* ── Диалог очистки всей истории ── */}
+      <ConfirmDialog
+        isOpen={dialog.type === 'delete-all'}
+        title="Очистить всю историю?"
+        message="Все чаты будут удалены безвозвратно. Вы уверены?"
+        confirmLabel="Очистить всё"
+        cancelLabel="Отмена"
+        danger
+        onConfirm={confirmDeleteAll}
+        onCancel={closeDialog}
+      />
     </div>
   )
 }
